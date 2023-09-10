@@ -24,8 +24,8 @@ class DbModels:
             Column("id", Integer, primary_key=True),
             Column("rf_id", Integer, unique=True),
             Column("name", String),
-            Column("entry_yrar", Integer),
-            Column("major_id", Integer, ForeignKey("majors.id"))
+            Column("entry_year", Integer),
+            Column("major_id", Integer, ForeignKey("majors.id", ondelete="CASCADE", onupdate="CASCADE"))
         )
     
     def _create_absences_table(self) -> None:
@@ -42,7 +42,7 @@ class DbModels:
             "majors",
             self.metadata,
             Column("id", Integer, primary_key=True),
-            Column("name", String)
+            Column("name", String, unique=True)
         )
     
     def _create_admins_table(self) -> None:
