@@ -25,7 +25,7 @@ class DbModels:
             Column("rf_id", Integer, unique=True),
             Column("name", String),
             Column("entry_year", Integer),
-            Column("major_id", Integer, ForeignKey("majors.id", ondelete="CASCADE", onupdate="CASCADE"))
+            Column("major_id", Integer, ForeignKey("majors.id", ondelete="CASCADE"))
         )
     
     def _create_absences_table(self) -> None:
@@ -71,7 +71,7 @@ class DbModels:
             "meal_types",
             self.metadata,
             Column("id", Integer, primary_key=True),
-            Column("name", String),
+            Column("name", String, unique=True)
         )
     
     def _create_meals_table(self) -> None:

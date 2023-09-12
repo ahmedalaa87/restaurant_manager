@@ -8,7 +8,9 @@ from lib.singleton_handler import Singleton
 
 if TYPE_CHECKING:
     from models.majors_models import MajorIn, MajorOut, MajorUpdate
-    from models.students_models import Student, StudentIn, StudentUpdate
+    from models.students_models import Student, StudentIn
+    from models.meal_types_models import MealTypeIn, MealTypeOut
+    from models.meals_models import MealIn, MealOut
     
 
 class DataBaseManger(metaclass=Singleton):
@@ -74,3 +76,80 @@ class DataBaseManger(metaclass=Singleton):
         query = self.models.students.delete().where(self.models.students.c.id == student_id)
         await self.db.execute(query)
 
+    async def get_meal_type_by_id(self, meal_type_id: int) -> MealTypeOut:
+        query = self.models.meal_types.select().where(self.models.meal_types.c.id == meal_type_id)
+        return await self.db.fetch_one(query)
+    
+    async def create_meal_type(self, meal_type: MealTypeIn) -> int:
+        query = self.models.meal_types.insert().values(**meal_type.dict())
+        return await self.db.execute(query)
+    
+    async def get_all_meal_types(self) -> list[MealTypeOut]:
+        query = self.models.meal_types.select()
+        return await self.db.fetch_all(query)
+    
+    async def update_meal_type(self, meal_type_id: int, meal_type: MealTypeIn) -> MealTypeOut:
+        query = self.models.meal_types.update().where(self.models.meal_types.c.id == meal_type_id).values(**meal_type.dict())
+        return await self.db.execute(query)
+    
+    async def delete_meal_type(self, meal_type_id: int) -> None:
+        query = self.models.meal_types.delete().where(self.models.meal_types.c.id == meal_type_id)
+        await self.db.execute(query)
+
+    async def create_meal(self, meal: MealIn) -> int:
+        query = self.models.meals.insert().values(**meal.dict())
+        return await self.db.execute(query)
+    
+    async def get_meal(self, meal_id: int) -> MealOut:
+        query = self.models.meals.select().where(self.models.meals.c.id == meal_id)
+        return await self.db.fetch_one(query)
+    
+    async def get_all_meals(self) -> list[MealOut]:
+        query = self.models.meals.select()
+        return await self.db.fetch_all(query)
+    
+    async def update_meal(self, meal_id: int, meal: MealIn) -> MealOut:
+        query = self.models.meals.update().where(self.models.meals.c.id == meal_id).values(**meal.dict())
+        return await self.db.execute(query)
+    
+    async def delete_meal(self, meal_id: int) -> None:
+        query = self.models.meals.delete().where(self.models.meals.c.id == meal_id)
+        await self.db.execute(query)
+
+    async def get_student_meals(self, student_id: int) -> list[MealOut]:
+        query = self.models.meals.select().where(self.models.meals.c.student_id == student_id)
+        return await self.db.fetch_all(query)
+    
+    async def get_student_meals_by_date(self, student_id: int, date: str = None) -> list[MealOut]:
+        query = f"""
+        SELECT *, :date FROM meals WHERE meals.student_id = :student_id AND DATE(meals.date_time) = {'DATE()' if not date else 'STRFTIME(:date)'};
+        """
+        return await self.db.fetch_all(query=query, values={"student_id": student_id, "date": date})
+    
+    async def get_student_meals_by_meal_type(self, student_id: int, meal_type_id: int) -> list[MealOut]:
+        query = self.models.meals.select().where(self.models.meals.c.student_id == student_id and self.models.meals.c.meal_type_id == meal_type_id)
+        return await self.db.fetch_all(query)
+    
+    async def get_student_meal_by_date_and_meal_type(self, student_id: int, meal_type_id: int, date: str = None) -> MealOut:
+        query = f"""
+        SELECT *, :date FROM meals WHERE meals.student_id = :student_id AND meals.meal_type_id = :meal_type_id AND DATE(meals.date_time) = {'DATE()' if not date else 'STRFTIME(:date)'};
+        """
+        return await self.db.fetch_one(query=query, values={"student_id": student_id, "meal_type_id": meal_type_id, "date": date})
+    
+    async def get_student_meals_by_date_and_meal_type(self, student_id: int, meal_type_id: int, date: str = None) -> list[MealOut]:
+        query = f"""
+        SELECT *, :date FROM meals WHERE meals.student_id = :student_id AND meals.meal_type_id = :meal_type_id AND DATE(meals.date_time) = {'DATE()' if not date else 'STRFTIME(:date)'};
+        """
+        return await self.db.fetch_all(query=query, values={"student_id": student_id, "meal_type_id": meal_type_id, "date": date})
+    
+    async def get_meals_by_date_and_meal_type(self, meal_type_id: int, date: str = None) -> list[MealOut]:
+        query = f"""
+        SELECT *, :date FROM meals WHERE meals.meal_type_id = :meal_type_id AND DATE(meals.date_time) = {'DATE()' if not date else 'STRFTIME(:date)'};
+        """
+        return await self.db.fetch_all(query=query, values={"meal_type_id": meal_type_id, "date": date})
+    
+    async def get_meals_count_by_date_and_meal_type(self, meal_type_id: int, date: str = None) -> int:
+        query = f"""
+        SELECT COUNT(*) FROM meals WHERE meals.meal_type_id = :meal_type_id AND DATE(meals.date_time) = {'DATE()' if not date else 'STRFTIME(:date)'};
+        """
+        return await self.db.fetch_val(query=query, values={"meal_type_id": meal_type_id, "date": date})
