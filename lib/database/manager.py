@@ -11,6 +11,7 @@ if TYPE_CHECKING:
     from models.students_models import Student, StudentIn
     from models.meal_types_models import MealTypeIn, MealTypeOut
     from models.meals_models import MealIn, MealOut
+    from models.admins_models import AdminIn, Admin
     
 
 class DataBaseManger(metaclass=Singleton):
@@ -153,3 +154,26 @@ class DataBaseManger(metaclass=Singleton):
         SELECT COUNT(*) FROM meals WHERE meals.meal_type_id = :meal_type_id AND DATE(meals.date_time) = {'DATE()' if not date else 'STRFTIME(:date)'};
         """
         return await self.db.fetch_val(query=query, values={"meal_type_id": meal_type_id, "date": date})
+    
+    async def create_admin(self, admin: AdminIn) -> int:
+        query = self.models.admins.insert().values(**admin.dict())
+        return await self.db.execute(query)
+    
+    async def get_admin(self, id_or_email: int | str) -> Admin | None:
+        if isinstance(id_or_email, int):
+            query = self.models.admins.select().where(self.models.admins.c.id == id_or_email)
+        else:
+            query = self.models.admins.select().where(self.models.admins.c.email == id_or_email)
+        return await self.db.fetch_one(query)
+    
+    async def get_all_admins(self) -> list[Admin]:
+        query = self.models.admins.select()
+        return await self.db.fetch_all(query)
+    
+    async def update_admin(self, admin_id: int, **fields) -> None:
+        query = self.models.admins.update().where(self.models.admins.c.id == admin_id).values(**fields)
+        await self.db.execute(query)
+
+    async def delete_admin(self, admin_id: int) -> None:
+        query = self.models.admins.delete().where(self.models.admins.c.id == admin_id)
+        await self.db.execute(query)

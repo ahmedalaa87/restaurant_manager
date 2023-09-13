@@ -21,10 +21,6 @@ async def student_has_meal_type_today(student_id: int, meal_type_id: int) -> boo
     meal = await DataBaseManger().get_student_meal_by_date_and_meal_type(student_id, meal_type_id)
     return True if meal else False
 
-async def student_has_meal_type_at_date(student_id: int, meal_type_id: int, date: str) -> bool:
-    meal = await DataBaseManger().get_student_meal_by_date_and_meal_type(student_id, meal_type_id, date)
-    return True if meal else False
-
-async def student_has_this_meal_type_today(student_id: int, meal_type_id: int) -> bool:
-    meal = await DataBaseManger().get_student_meal_by_date_and_meal_type(student_id, meal_type_id)
-    return True if meal else False
+async def admin_exists(admin_id: int) -> bool:
+    admin = await DataBaseManger().get_admin(admin_id)
+    return True if admin else False

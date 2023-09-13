@@ -1,11 +1,11 @@
 from fastapi import APIRouter, status
-from lib.checks.checks import meal_exists, student_exists, meal_type_exists, student_has_meal_type_today, student_has_meal_type_at_date, student_has_this_meal_type_today
+from lib.checks.checks import meal_exists, student_exists, meal_type_exists, student_has_meal_type_today
 from models.meals_models import MealIn, MealOut
 from lib.exceptions.meals import MealNotFound, StudentAlreadyHasMeal
 from lib.exceptions.students import StudentNotFound
 from lib.exceptions.meal_types import MealTypeNotFound
 from lib.database.manager import DataBaseManger
-from datetime import datetime, date
+from datetime import date
 
 meals = APIRouter(
     prefix="/meals",
