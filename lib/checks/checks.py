@@ -24,3 +24,15 @@ async def student_has_meal_type_today(student_id: int, meal_type_id: int) -> boo
 async def admin_exists(admin_id: int) -> bool:
     admin = await DataBaseManger().get_admin(admin_id)
     return True if admin else False
+
+async def absence_exists(absence_id: int) -> bool:
+    absence = await DataBaseManger().get_absence(absence_id)
+    return True if absence else False
+
+async def student_is_absent_today(student_id: int) -> bool:
+    absence = await DataBaseManger().get_student_absence_by_date(student_id)
+    return True if absence else False
+
+async def student_is_absent_at_date(student_id: int, date: str) -> bool:
+    absence = await DataBaseManger().get_student_absence_by_date(student_id, date)
+    return True if absence else False

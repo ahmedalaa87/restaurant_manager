@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from models.meal_types_models import MealTypeIn, MealTypeOut
     from models.meals_models import MealIn, MealOut
     from models.admins_models import AdminIn, Admin
+    from models.absences_models import AbsenceIn, Absence
     
 
 class DataBaseManger(metaclass=Singleton):
@@ -177,3 +178,33 @@ class DataBaseManger(metaclass=Singleton):
     async def delete_admin(self, admin_id: int) -> None:
         query = self.models.admins.delete().where(self.models.admins.c.id == admin_id)
         await self.db.execute(query)
+
+    async def set_student_as_absent_today(self, absence: AbsenceIn) -> int:
+        query = self.models.absences.insert().values(**absence.dict())
+        return await self.db.execute(query)
+    
+    async def get_student_absence_by_date(self, student_id: int, date: str = None) -> Absence:
+        query = f"""
+        SELECT *, :date FROM absences WHERE absences.student_id = :student_id AND absences.date = {'DATE()' if not date else 'STRFTIME(:date)'};
+        """
+        return await self.db.fetch_one(query=query, values={"student_id": student_id, "date": date})
+    
+    async def get_absence(self, absence_id: int) -> Absence:
+        query = self.models.absences.select().where(self.models.absences.c.id == absence_id)
+        return await self.db.fetch_one(query)
+    
+    async def get_all_absences(self) -> list[Absence]:
+        query = self.models.absences.select()
+        return await self.db.fetch_all(query)
+    
+    async def delete_absence(self, absence_id: int) -> None:
+        query = self.models.absences.delete().where(self.models.absences.c.id == absence_id)
+        return await self.db.execute(query)
+
+    async def delete_student_today_absence(self, student_id: int) -> None:
+        query = "DELETE FROM absences WHERE absences.student_id = :student_id AND absences.date = DATE();"
+        return await self.db.execute(query=query, values={"student_id": student_id})
+    
+    async def delete_student_absence_at_date(self, student_id: int, date: str) -> None:
+        query = "DELETE FROM absences WHERE absences.student_id = :student_id AND absences.date = STRFTIME(:date);"
+        return await self.db.execute(query=query, values={"student_id": student_id, "date": date})
