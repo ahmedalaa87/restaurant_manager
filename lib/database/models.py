@@ -1,4 +1,4 @@
-from sqlalchemy import Date, DateTime, String, Integer, ForeignKey, MetaData, Table, Column
+from sqlalchemy import Date, DateTime, String, Integer, ForeignKey, MetaData, Table, Column, Boolean
 
 
 class DbModels:
@@ -25,7 +25,8 @@ class DbModels:
             Column("rf_id", Integer, unique=True),
             Column("name", String),
             Column("entry_year", Integer),
-            Column("major_id", Integer, ForeignKey("majors.id", ondelete="CASCADE"))
+            Column("major_id", Integer, ForeignKey("majors.id", ondelete="CASCADE")),
+            Column("will_stay", Boolean, server_default="0")
         )
     
     def _create_absences_table(self) -> None:

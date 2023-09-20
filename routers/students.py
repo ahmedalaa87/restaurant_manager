@@ -2,9 +2,10 @@ from fastapi import APIRouter, status
 from models.students_models import StudentIn, StudentOut, StudentUpdate, StudentRfidOut
 from lib.database.manager import DataBaseManger
 from sqlite3 import IntegrityError
-from lib.checks.checks import student_exists
-from lib.exceptions.students import StudentNotFound, RfidAlreadyExists
+from lib.checks.checks import student_exists, student_is_stayer
+from lib.exceptions.students import StudentNotFound, RfidAlreadyExists, CannotUpdateWillStay, StudentAlreadyStayer, StudentIsNotStayer
 from lib.exceptions.majors import MajorNotFound
+import datetime
 
 students = APIRouter(
     prefix="/students",
@@ -76,7 +77,31 @@ async def get_students_by_major(major_id: int):
     return await DataBaseManger().get_students_by_major(major_id)
 
 
+@students.put("/will_stay/{student_id}", status_code=status.HTTP_200_OK)
+async def update_will_stay(student_id: int):
+    if not await student_exists(student_id):
+        raise StudentNotFound()
+    
+    if datetime.datetime.now().weekday() in [3, 4, 5, 6]:
+        raise CannotUpdateWillStay()
+    
+    if await student_is_stayer(student_id):
+        raise StudentAlreadyStayer()
+        
+    await DataBaseManger().set_will_stay(student_id)
+    return {"message": "Student will stay"}
 
 
-
-
+@students.put("/will_not_stay/{student_id}", status_code=status.HTTP_200_OK)
+async def update_will_not_stay(student_id: int):
+    if not await student_exists(student_id):
+        raise StudentNotFound()
+    
+    if datetime.datetime.now().weekday() in [3, 4, 5, 6]:
+        raise CannotUpdateWillStay()
+    
+    if not await student_is_stayer(student_id):
+        raise StudentIsNotStayer()
+        
+    await DataBaseManger().set_will_not_stay(student_id)
+    return {"message": "Student will not stay"}

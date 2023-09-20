@@ -1,11 +1,11 @@
 from fastapi import APIRouter, status
-from lib.checks.checks import meal_exists, student_exists, meal_type_exists, student_has_meal_type_today
+from lib.checks.checks import meal_exists, student_exists, meal_type_exists, student_has_meal_type_today, student_is_absent_today, student_is_stayer
 from models.meals_models import MealIn, MealOut
-from lib.exceptions.meals import MealNotFound, StudentAlreadyHasMeal
+from lib.exceptions.meals import MealNotFound, StudentAlreadyHasMeal, StudentIsAbsent, StudentIsNotStayer
 from lib.exceptions.students import StudentNotFound
 from lib.exceptions.meal_types import MealTypeNotFound
 from lib.database.manager import DataBaseManger
-from datetime import date
+from datetime import date, datetime
 
 meals = APIRouter(
     prefix="/meals",
@@ -21,6 +21,24 @@ async def create_meal(meal: MealIn):
         raise StudentNotFound()
     if await student_has_meal_type_today(meal.student_id, meal.meal_type_id):
         raise StudentAlreadyHasMeal()
+    if await student_is_absent_today(meal.student_id):
+        raise StudentIsAbsent()
+    if datetime.now().weekday() == 3 and meal.meal_type_id in [2, 3] and not await student_is_stayer(meal.student_id):
+        raise StudentIsNotStayer()
+    if datetime.now().weekday() == 4 and not await student_is_stayer(meal.student_id):
+        raise StudentIsNotStayer()
+    if datetime.now().weekday() == 5 and meal.meal_type_id in [1, 2] and not await student_is_stayer(meal.student_id):
+        raise StudentIsNotStayer()
+    meal_id = await DataBaseManger().create_meal(meal)
+    return {"id": meal_id, **meal.dict()}
+
+
+@meals.post("/force", response_model=MealOut, status_code=status.HTTP_201_CREATED)
+async def force_create_meal(meal: MealIn):
+    if not await meal_type_exists(meal.meal_type_id):
+        raise MealTypeNotFound()
+    if not await student_exists(meal.student_id):
+        raise StudentNotFound()
     meal_id = await DataBaseManger().create_meal(meal)
     return {"id": meal_id, **meal.dict()}
 

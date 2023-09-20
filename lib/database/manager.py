@@ -13,6 +13,7 @@ if TYPE_CHECKING:
     from models.meals_models import MealIn, MealOut
     from models.admins_models import AdminIn, Admin
     from models.absences_models import AbsenceIn, Absence
+    from models.owners_models import OwnerOut
     
 
 class DataBaseManger(metaclass=Singleton):
@@ -208,3 +209,21 @@ class DataBaseManger(metaclass=Singleton):
     async def delete_student_absence_at_date(self, student_id: int, date: str) -> None:
         query = "DELETE FROM absences WHERE absences.student_id = :student_id AND absences.date = STRFTIME(:date);"
         return await self.db.execute(query=query, values={"student_id": student_id, "date": date})
+    
+    async def get_owner(self, id_or_email: int | str) -> OwnerOut | None:
+        query = f"""
+        SELECT *  FROM owners WHERE {'owners.email = :id_or_email' if isinstance(id_or_email, str) else 'owners.id = :id_or_email'}
+        """
+        return await self.db.fetch_one(query, {"id_or_email": id_or_email})
+    
+    async def reset_will_stay_column(self) -> None:
+        query = "UPDATE students SET will_stay = 0;"
+        await self.db.execute(query)
+    
+    async def set_will_stay(self, student_id: int) -> None:
+        query = "UPDATE students SET will_stay = 1 WHERE students.id = :student_id;"
+        await self.db.execute(query, {"student_id": student_id})
+
+    async def set_will_not_stay(self, student_id: int) -> None:
+        query = "UPDATE students SET will_stay = 0 WHERE students.id = :student_id;"
+        await self.db.execute(query, {"student_id": student_id})

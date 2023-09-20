@@ -36,3 +36,7 @@ async def student_is_absent_today(student_id: int) -> bool:
 async def student_is_absent_at_date(student_id: int, date: str) -> bool:
     absence = await DataBaseManger().get_student_absence_by_date(student_id, date)
     return True if absence else False
+
+async def student_is_stayer(student_id: int) -> bool:
+    student = await DataBaseManger().get_student(student_id)
+    return True if student.will_stay else False
