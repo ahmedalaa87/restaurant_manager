@@ -1,6 +1,6 @@
 import asyncio
 import datetime
-from lib.database.manager import DataBaseManger
+from lib.database.manager import DataBaseManager
 from lib.singleton_handler import Singleton
 
 class EverySundayResetWillStayColumn(metaclass=Singleton):
@@ -15,6 +15,6 @@ class EverySundayResetWillStayColumn(metaclass=Singleton):
     
     async def _update_will_stay_column(self, time_stamp: int):
         await asyncio.sleep(time_stamp)
-        await DataBaseManger().reset_will_stay_column()
+        await DataBaseManager().reset_will_stay_column()
         await self._calculate_time_stamp_until_next_sunday()
         

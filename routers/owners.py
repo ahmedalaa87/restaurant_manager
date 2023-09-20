@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Depends, status
-from lib.database.manager import DataBaseManger
+from lib.authentication.authentication import Authentication, oauth2_scheme, get_current_user
+from fastapi.security import OAuth2PasswordRequestForm
+from lib.database.manager import DataBaseManager
 from models.owners_models import OwnerBase, OwnerOut
 from lib.exceptions.owners import WrongEmailOrPassword
 
@@ -10,14 +12,24 @@ owners = APIRouter(
 )
 
 
-# @owners.post("/login", response_model=OwnerOut, status_code=status.HTTP_200_OK)
-# async def login(owner: OwnerBase, db: DataBaseManger = Depends()):
-#     db_owner = await db.get_owner_by_email(owner.email)
-#     if db_owner is None or db_owner.password != owner.password:
-#         raise WrongEmailOrPassword()
-#     return db_owner
+@owners.post("/login", response_model=OwnerOut, status_code=status.HTTP_200_OK)
+async def login_owner(form_data: OAuth2PasswordRequestForm = Depends()):
+    owner = await DataBaseManager().get_owner(form_data.username)
+    if not owner:
+        raise WrongEmailOrPassword()
+    if not Authentication.verify_password(form_data.password, owner.password):
+        raise WrongEmailOrPassword()
+    
+    access_token = Authentication().create_access_token({"id": owner.id, "role": "owner"})
+    refresh_token = Authentication().create_refresh_token({"id": owner.id, "role": "owner"})
+    return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
 
+@owners.post("/refresh", status_code=status.HTTP_200_OK)
+async def refresh_owner(token: str = Depends(oauth2_scheme)):
+    access_token, refresh_token = Authentication().refresh_token(token)
+    return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
 
-# @owners.get("/me", response_model=OwnerOut, status_code=status.HTTP_200_OK)
-# async def get_me(owner: OwnerOut = Depends(), db: DataBaseManger = Depends()):
-#     return await db.get_owner(owner.id)
+@owners.get("/me", response_model=OwnerOut, status_code=status.HTTP_200_OK)
+async def get_me(token: str = Depends(oauth2_scheme)):
+    owner = await get_current_user("owner", token=token)
+    return owner

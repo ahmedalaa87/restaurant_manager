@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from models.owners_models import OwnerOut
     
 
-class DataBaseManger(metaclass=Singleton):
+class DataBaseManager(metaclass=Singleton):
     def __init__(self, db_url: str) -> None:
         self.db_url = db_url
         self.db = Database(self.db_url)

@@ -1,7 +1,9 @@
 from fastapi import FastAPI
-from lib.database.manager import DataBaseManger
+from lib.authentication.authentication import Authentication
+from lib.database.manager import DataBaseManager
 from routers import majors, students, meal_types, meals, admins, absences, owners
 from lib.sunday_event_handler.sunday_event import EverySundayResetWillStayColumn
+from models.settings_models import Settings
 import datetime
 
 app = FastAPI()
@@ -13,15 +15,24 @@ app.include_router(admins.admins)
 app.include_router(absences.absences)
 app.include_router(owners.owners)
 
-DataBaseManger("sqlite:///database.db")
+settings = Settings()
+
+DataBaseManager("sqlite:///database.db")
+Authentication(
+    settings.access_token_secret_key,
+    settings.refresh_token_secret_key,
+    settings.algorithm,
+    settings.access_token_expire_minutes,
+    settings.refresh_token_expire_days
+)
 
 @app.on_event("startup")
 async def startup():
-    await DataBaseManger().connect()
+    await DataBaseManager().connect()
     EverySundayResetWillStayColumn()
-    if datetime.datetime.now().weekday() == 6:
-        await DataBaseManger().reset_will_stay_column()
+    if datetime.datetime.utcnow().weekday() == 6:
+        await DataBaseManager().reset_will_stay_column()
 
 @app.on_event("shutdown")
 async def shutdown():
-    await DataBaseManger().disconnect()
+    await DataBaseManager().disconnect()

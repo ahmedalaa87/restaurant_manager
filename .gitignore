@@ -4,3 +4,4 @@ test.py
 images/*
 env/*
 venv/
+.env
