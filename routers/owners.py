@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, status
 from lib.authentication.authentication import Authentication, oauth2_scheme, get_current_user
 from fastapi.security import OAuth2PasswordRequestForm
 from lib.database.manager import DataBaseManager
-from models.owners_models import OwnerBase, OwnerOut
+from models.owners_models import OwnerOut
 from lib.exceptions.owners import WrongEmailOrPassword
 
 

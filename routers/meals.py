@@ -23,7 +23,7 @@ async def create_meal(meal: MealIn, token: str = Depends(oauth2_scheme)):
         raise StudentNotFound()
     if await student_has_meal_type_today(meal.student_id, meal.meal_type_id):
         raise StudentAlreadyHasMeal()
-    if await student_is_absent_today(meal.student_id):
+    if await student_is_absent_today(meal.student_id) and meal.meal_type_id == 2 and datetime.now().weekday() != 3:
         raise StudentIsAbsent()
     if datetime.now().weekday() == 3 and meal.meal_type_id in [2, 3] and not await student_is_stayer(meal.student_id):
         raise StudentIsNotStayer()
