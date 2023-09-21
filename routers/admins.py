@@ -16,6 +16,7 @@ admins = APIRouter(
 @admins.post("/", response_model=AdminOut, status_code=status.HTTP_201_CREATED)
 async def create_admin(admin: AdminIn, token: str = Depends(oauth2_scheme)):
     _ = await get_current_user("owner", token=token)
+    admin.password = Authentication().get_password_hash(admin.password)
     try:
         id = await DataBaseManager().create_admin(admin)
     except IntegrityError:

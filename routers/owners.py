@@ -12,7 +12,7 @@ owners = APIRouter(
 )
 
 
-@owners.post("/login", response_model=OwnerOut, status_code=status.HTTP_200_OK)
+@owners.post("/login", status_code=status.HTTP_200_OK)
 async def login_owner(form_data: OAuth2PasswordRequestForm = Depends()):
     owner = await DataBaseManager().get_owner(form_data.username)
     if not owner:
