@@ -2,9 +2,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from databases import Database
 from sqlalchemy import create_engine, MetaData
+from sqlalchemy.sql import func
 
 from lib.database.models import DbModels
 from lib.singleton_handler import Singleton
+from fastapi_pagination import Page
+from fastapi_pagination.ext.databases import paginate
 
 if TYPE_CHECKING:
     from models.majors_models import MajorIn, MajorOut, MajorUpdate
@@ -63,13 +66,13 @@ class DataBaseManager(metaclass=Singleton):
         query = self.models.students.select().where(self.models.students.c.rf_id == rf_id)
         return await self.db.fetch_one(query)
     
-    async def get_students_by_major(self, major_id: int) -> list[Student]:
+    async def get_students_by_major(self, major_id: int) -> Page[Student]:
         query = self.models.students.select().where(self.models.students.c.major_id == major_id)
-        return await self.db.fetch_all(query)
+        return await paginate(self.db, query)
     
-    async def get_all_students(self) -> list[Student]:
+    async def get_all_students(self) -> Page[Student]:
         query = self.models.students.select()
-        return await self.db.fetch_all(query)
+        return await paginate(self.db, query)
     
     async def update_student(self, student_id: int, student: StudentIn) -> None:
         query = self.models.students.update().where(self.models.students.c.id == student_id).values(**student.dict())
@@ -107,9 +110,9 @@ class DataBaseManager(metaclass=Singleton):
         query = self.models.meals.select().where(self.models.meals.c.id == meal_id)
         return await self.db.fetch_one(query)
     
-    async def get_all_meals(self) -> list[MealOut]:
+    async def get_all_meals(self) -> Page[MealOut]:
         query = self.models.meals.select()
-        return await self.db.fetch_all(query)
+        return await paginate(self.db, query)
     
     async def update_meal(self, meal_id: int, meal: MealIn) -> MealOut:
         query = self.models.meals.update().where(self.models.meals.c.id == meal_id).values(**meal.dict())
@@ -119,9 +122,9 @@ class DataBaseManager(metaclass=Singleton):
         query = self.models.meals.delete().where(self.models.meals.c.id == meal_id)
         await self.db.execute(query)
 
-    async def get_student_meals(self, student_id: int) -> list[MealOut]:
+    async def get_student_meals(self, student_id: int) -> Page[MealOut]:
         query = self.models.meals.select().where(self.models.meals.c.student_id == student_id)
-        return await self.db.fetch_all(query)
+        return await paginate(self.db, query)
     
     async def get_student_meals_by_date(self, student_id: int, date: str = None) -> list[MealOut]:
         query = f"""
@@ -129,9 +132,9 @@ class DataBaseManager(metaclass=Singleton):
         """
         return await self.db.fetch_all(query=query, values={"student_id": student_id, "date": date})
     
-    async def get_student_meals_by_meal_type(self, student_id: int, meal_type_id: int) -> list[MealOut]:
+    async def get_student_meals_by_meal_type(self, student_id: int, meal_type_id: int) -> Page[MealOut]:
         query = self.models.meals.select().where(self.models.meals.c.student_id == student_id and self.models.meals.c.meal_type_id == meal_type_id)
-        return await self.db.fetch_all(query)
+        return await paginate(self.db, query)
     
     async def get_student_meal_by_date_and_meal_type(self, student_id: int, meal_type_id: int, date: str = None) -> MealOut:
         query = f"""
@@ -145,11 +148,21 @@ class DataBaseManager(metaclass=Singleton):
         """
         return await self.db.fetch_all(query=query, values={"student_id": student_id, "meal_type_id": meal_type_id, "date": date})
     
-    async def get_meals_by_date_and_meal_type(self, meal_type_id: int, date: str = None) -> list[MealOut]:
-        query = f"""
-        SELECT *, :date FROM meals WHERE meals.meal_type_id = :meal_type_id AND DATE(meals.date_time) = {'DATE()' if not date else 'STRFTIME(:date)'};
-        """
-        return await self.db.fetch_all(query=query, values={"meal_type_id": meal_type_id, "date": date})
+    async def get_meals_by_date_and_meal_type(self, meal_type_id: int, date: str = None) -> Page[MealOut]:
+        if not date:
+            query = self.models.meals.select().where(self.models.meals.c.meal_type_id == meal_type_id, func.DATE(self.models.meals.c.date_time) == func.current_date())
+        else:
+            query = self.models.meals.select().where(self.models.meals.c.meal_type_id == meal_type_id, func.DATE(self.models.meals.c.date_time) == func.strftime(date))
+
+        return await paginate(self.db, query)
+    
+    async def get_meals_by_date(self, date: str = None) -> Page[MealOut]:
+        if not date:
+            query = self.models.meals.select().where(func.DATE(self.models.meals.c.date_time) == func.current_date())
+        else:
+            query = self.models.meals.select().where(func.DATE(self.models.meals.c.date_time) == func.strftime(date))
+
+        return await paginate(self.db, query=query)
     
     async def get_meals_count_by_date_and_meal_type(self, meal_type_id: int, date: str = None) -> int:
         query = f"""
@@ -194,9 +207,9 @@ class DataBaseManager(metaclass=Singleton):
         query = self.models.absences.select().where(self.models.absences.c.id == absence_id)
         return await self.db.fetch_one(query)
     
-    async def get_all_absences(self) -> list[Absence]:
+    async def get_all_absences(self) -> Page[Absence]:
         query = self.models.absences.select()
-        return await self.db.fetch_all(query)
+        return await paginate(self.db, query)
     
     async def delete_absence(self, absence_id: int) -> None:
         query = self.models.absences.delete().where(self.models.absences.c.id == absence_id)

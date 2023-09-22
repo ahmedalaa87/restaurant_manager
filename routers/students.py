@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status, Depends
+from fastapi import APIRouter, status, Depends, Query
 from lib.authentication.authentication import oauth2_scheme, get_current_user
 from models.students_models import StudentIn, StudentOut, StudentUpdate, StudentRfidOut
 from lib.database.manager import DataBaseManager
@@ -7,11 +7,14 @@ from lib.checks.checks import student_exists, student_is_stayer
 from lib.exceptions.students import StudentNotFound, RfidAlreadyExists, CannotUpdateWillStay, StudentAlreadyStayer, StudentIsNotStayer
 from lib.exceptions.majors import MajorNotFound
 import datetime
+from fastapi_pagination import Page
 
 students = APIRouter(
     prefix="/students",
     tags=["students"]
 )
+
+Page = Page.with_custom_options(size= Query(20, ge=1, le=400))
 
 
 @students.post("/", response_model=StudentOut, status_code=status.HTTP_201_CREATED)
@@ -50,7 +53,7 @@ async def get_student_by_rfid(rf_id: int, token: str = Depends(oauth2_scheme)):
     return student
 
 
-@students.get("/", response_model=list[StudentOut], status_code=status.HTTP_200_OK)
+@students.get("/", response_model=Page[StudentOut], status_code=status.HTTP_200_OK)
 async def get_all_students(token: str = Depends(oauth2_scheme)):
     _ = await get_current_user("admin", token=token)
     return await DataBaseManager().get_all_students()
@@ -75,7 +78,7 @@ async def delete_student(student_id: int, token: str = Depends(oauth2_scheme)):
     await DataBaseManager().delete_student(student_id)
 
 
-@students.get("/major/{major_id}", response_model=list[StudentOut], status_code=status.HTTP_200_OK)
+@students.get("/major/{major_id}", response_model=Page[StudentOut], status_code=status.HTTP_200_OK)
 async def get_students_by_major(major_id: int, token: str = Depends(oauth2_scheme)):
     _ = await get_current_user("admin", token=token)
     major = await DataBaseManager().get_major(major_id)

@@ -5,6 +5,7 @@ from routers import majors, students, meal_types, meals, admins, absences, owner
 from lib.sunday_event_handler.sunday_event import EverySundayResetWillStayColumn
 from models.settings_models import Settings
 import datetime
+from fastapi_pagination import add_pagination
 
 app = FastAPI()
 app.include_router(majors.majors)
@@ -14,6 +15,8 @@ app.include_router(meals.meals)
 app.include_router(admins.admins)
 app.include_router(absences.absences)
 app.include_router(owners.owners)
+
+add_pagination(app)
 
 settings = Settings()
 

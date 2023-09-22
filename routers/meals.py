@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status, Depends
+from fastapi import APIRouter, status, Depends, Query
 from lib.authentication.authentication import oauth2_scheme, get_current_user
 from lib.checks.checks import meal_exists, student_exists, meal_type_exists, student_has_meal_type_today, student_is_absent_today, student_is_stayer
 from models.meals_models import MealIn, MealOut
@@ -7,12 +7,14 @@ from lib.exceptions.students import StudentNotFound
 from lib.exceptions.meal_types import MealTypeNotFound
 from lib.database.manager import DataBaseManager
 from datetime import date, datetime
+from fastapi_pagination import Page
 
 meals = APIRouter(
     prefix="/meals",
     tags=["meals"]
 )
 
+Page = Page.with_custom_options(size= Query(20, ge=1, le=100000))
 
 @meals.post("/", response_model=MealOut, status_code=status.HTTP_201_CREATED)
 async def create_meal(meal: MealIn, token: str = Depends(oauth2_scheme)):
@@ -46,6 +48,18 @@ async def force_create_meal(meal: MealIn, token: str = Depends(oauth2_scheme)):
     return {"id": meal_id, **meal.dict()}
 
 
+@meals.get("/date", response_model=Page[MealOut])
+async def get_meals_by_date(date: date = None, token: str = Depends(oauth2_scheme)):
+    _ = await get_current_user("admin", token=token)
+    return await DataBaseManager().get_meals_by_date(date)
+
+
+@meals.get("/", response_model=Page[MealOut])
+async def get_all_meals(token: str = Depends(oauth2_scheme)):
+    _ = await get_current_user("admin", token=token)
+    return await DataBaseManager().get_all_meals()
+
+
 @meals.get("/{meal_id}", response_model=MealOut)
 async def get_meal(meal_id: int, token: str = Depends(oauth2_scheme)):
     _ = await get_current_user("admin", token=token)
@@ -55,10 +69,12 @@ async def get_meal(meal_id: int, token: str = Depends(oauth2_scheme)):
     return meal
 
 
-@meals.get("/", response_model=list[MealOut])
-async def get_all_meals(token: str = Depends(oauth2_scheme)):
+@meals.get("/date/{meal_type_id}", response_model=Page[MealOut])
+async def get_meals_by_date_and_meal_type(meal_type_id: int, date: date = None, token: str = Depends(oauth2_scheme)):
     _ = await get_current_user("admin", token=token)
-    return await DataBaseManager().get_all_meals()
+    if not await meal_type_exists(meal_type_id):
+        raise MealTypeNotFound()
+    return await DataBaseManager().get_meals_by_date_and_meal_type(meal_type_id, date)
 
 
 @meals.put("/{meal_id}", response_model=MealOut)
@@ -78,7 +94,7 @@ async def delete_meal(meal_id: int, token: str = Depends(oauth2_scheme)):
     await DataBaseManager().delete_meal(meal_id)
 
 
-@meals.get("/student/{student_id}", response_model=list[MealOut])
+@meals.get("/student/{student_id}", response_model=Page[MealOut])
 async def get_student_meals(student_id: int, token: str = Depends(oauth2_scheme)):
     _ = await get_current_user("admin", token=token)
     if not await student_exists(student_id):
