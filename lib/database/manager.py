@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from databases import Database
 from sqlalchemy import create_engine, MetaData
-from sqlalchemy.sql import func
+from sqlalchemy.sql import func, select
 
 from lib.database.models import DbModels
 from lib.singleton_handler import Singleton
@@ -13,6 +13,7 @@ if TYPE_CHECKING:
     from models.majors_models import MajorIn, MajorOut, MajorUpdate
     from models.students_models import Student, StudentIn
     from models.meal_types_models import MealTypeIn, MealTypeOut
+    from models.meal_students_models import MealStudentIn, MealStudentOut
     from models.meals_models import MealIn, MealOut
     from models.admins_models import AdminIn, Admin
     from models.absences_models import AbsenceIn, Absence
@@ -62,10 +63,6 @@ class DataBaseManager(metaclass=Singleton):
         query = self.models.students.select().where(self.models.students.c.id == student_id)
         return await self.db.fetch_one(query)
     
-    async def get_student_by_rfid(self, rf_id: int) -> Student:
-        query = self.models.students.select().where(self.models.students.c.rf_id == rf_id)
-        return await self.db.fetch_one(query)
-    
     async def get_students_by_major(self, major_id: int) -> Page[Student]:
         query = self.models.students.select().where(self.models.students.c.major_id == major_id)
         return await paginate(self.db, query)
@@ -107,11 +104,17 @@ class DataBaseManager(metaclass=Singleton):
         return await self.db.execute(query)
     
     async def get_meal(self, meal_id: int) -> MealOut:
-        query = self.models.meals.select().where(self.models.meals.c.id == meal_id)
+        query = select([self.models.meals, func.count(self.models.meal_students.c.student_id).label('students_count')]).select_from(self.models.meals.outerjoin(self.models.meal_students, self.models.meals.c.id == self.models.meal_students.c.meal_id)).group_by(self.models.meals.c.id).where(self.models.meals.c.id == meal_id)
         return await self.db.fetch_one(query)
     
     async def get_all_meals(self) -> Page[MealOut]:
-        query = self.models.meals.select()
+        query = select([
+                    self.models.meals,
+                    func.count(self.models.meal_students.c.student_id).label('students_count')
+                ]).select_from(
+                    self.models.meals.outerjoin(self.models.meal_students, self.models.meals.c.id == self.models.meal_students.c.meal_id)
+                ).group_by(self.models.meals.c.id)
+        
         return await paginate(self.db, query)
     
     async def update_meal(self, meal_id: int, meal: MealIn) -> MealOut:
@@ -121,55 +124,51 @@ class DataBaseManager(metaclass=Singleton):
     async def delete_meal(self, meal_id: int) -> None:
         query = self.models.meals.delete().where(self.models.meals.c.id == meal_id)
         await self.db.execute(query)
+    
+    async def create_meal_student(self, meal_student: MealStudentIn) -> int:
+        query = self.models.meal_students.insert().values(**meal_student.dict())
+        return await self.db.execute(query)
 
-    async def get_student_meals(self, student_id: int) -> Page[MealOut]:
-        query = self.models.meals.select().where(self.models.meals.c.student_id == student_id)
+    async def get_meal_student(self, meal_student_id: int) -> MealStudentOut:
+        query = self.models.meal_students.select().where(self.models.meal_students.c.id == meal_student_id)
+        return await self.db.fetch_one(query)
+    
+    async def get_all_meal_students(self, meal_id: int) -> Page[MealStudentOut]:
+        query = self.models.meal_students.select().where(self.models.meal_students.c.meal_id == meal_id)
         return await paginate(self.db, query)
     
-    async def get_student_meals_by_date(self, student_id: int, date: str = None) -> list[MealOut]:
-        query = f"""
-        SELECT *, :date FROM meals WHERE meals.student_id = :student_id AND DATE(meals.date_time) = {'DATE()' if not date else 'STRFTIME(:date)'};
-        """
-        return await self.db.fetch_all(query=query, values={"student_id": student_id, "date": date})
+    async def get_student_meal(self, student_id: int, meal_id: int) -> MealStudentOut:
+        query = self.models.meal_students.select().where(self.models.meal_students.c.student_id == student_id, self.models.meal_students.c.meal_id == meal_id)
+        return await self.db.fetch_one(query)
     
-    async def get_student_meals_by_meal_type(self, student_id: int, meal_type_id: int) -> Page[MealOut]:
-        query = self.models.meals.select().where(self.models.meals.c.student_id == student_id and self.models.meals.c.meal_type_id == meal_type_id)
-        return await paginate(self.db, query)
+    async def update_meal_student(self, meal_student_id: int, meal_student: MealStudentIn) -> None:
+        query = self.models.meal_students.update().where(self.models.meal_students.c.id == meal_student_id).values(**meal_student.dict())
+        await self.db.execute(query)
     
-    async def get_student_meal_by_date_and_meal_type(self, student_id: int, meal_type_id: int, date: str = None) -> MealOut:
-        query = f"""
-        SELECT *, :date FROM meals WHERE meals.student_id = :student_id AND meals.meal_type_id = :meal_type_id AND DATE(meals.date_time) = {'DATE()' if not date else 'STRFTIME(:date)'};
-        """
-        return await self.db.fetch_one(query=query, values={"student_id": student_id, "meal_type_id": meal_type_id, "date": date})
-    
-    async def get_student_meals_by_date_and_meal_type(self, student_id: int, meal_type_id: int, date: str = None) -> list[MealOut]:
-        query = f"""
-        SELECT *, :date FROM meals WHERE meals.student_id = :student_id AND meals.meal_type_id = :meal_type_id AND DATE(meals.date_time) = {'DATE()' if not date else 'STRFTIME(:date)'};
-        """
-        return await self.db.fetch_all(query=query, values={"student_id": student_id, "meal_type_id": meal_type_id, "date": date})
-    
-    async def get_meals_by_date_and_meal_type(self, meal_type_id: int, date: str = None) -> Page[MealOut]:
+    async def delete_meal_student(self, meal_student_id: int) -> None:
+        query = self.models.meal_students.delete().where(self.models.meal_students.c.id == meal_student_id)
+        await self.db.execute(query)
+
+    async def get_meal_by_date_and_meal_type(self, meal_type_id: int, date: str = None) -> MealOut:
         if not date:
-            query = self.models.meals.select().where(self.models.meals.c.meal_type_id == meal_type_id, func.DATE(self.models.meals.c.date_time) == func.current_date())
+            query = select([self.models.meals, func.count(self.models.meal_students.c.student_id).label('students_count')]).select_from(self.models.meals.outerjoin(self.models.meal_students, self.models.meals.c.id == self.models.meal_students.c.meal_id)).group_by(self.models.meals.c.id).where(self.models.meals.c.meal_type_id == meal_type_id, func.DATE(self.models.meals.c.date_time) == func.current_date())
         else:
-            query = self.models.meals.select().where(self.models.meals.c.meal_type_id == meal_type_id, func.DATE(self.models.meals.c.date_time) == func.strftime(date))
+            query = select([self.models.meals, func.count(self.models.meal_students.c.student_id).label('students_count')]).select_from(self.models.meals.outerjoin(self.models.meal_students, self.models.meals.c.id == self.models.meal_students.c.meal_id)).group_by(self.models.meals.c.id).where(self.models.meals.c.meal_type_id == meal_type_id, func.DATE(self.models.meals.c.date_time) == func.strftime(date))
 
-        return await paginate(self.db, query)
+        return await self.db.fetch_one(query)
     
     async def get_meals_by_date(self, date: str = None) -> Page[MealOut]:
         if not date:
-            query = self.models.meals.select().where(func.DATE(self.models.meals.c.date_time) == func.current_date())
+            query = select([self.models.meals, func.count(self.models.meal_students.c.student_id).label('students_count')]).select_from(self.models.meals.outerjoin(self.models.meal_students, self.models.meals.c.id == self.models.meal_students.c.meal_id)).group_by(self.models.meals.c.id).where(func.DATE(self.models.meals.c.date_time) == func.current_date())
         else:
-            query = self.models.meals.select().where(func.DATE(self.models.meals.c.date_time) == func.strftime(date))
+            query = select([self.models.meals, func.count(self.models.meal_students.c.student_id).label('students_count')]).select_from(self.models.meals.outerjoin(self.models.meal_students, self.models.meals.c.id == self.models.meal_students.c.meal_id)).group_by(self.models.meals.c.id).where(func.DATE(self.models.meals.c.date_time) == func.strftime(date))
 
-        return await paginate(self.db, query=query)
+        return await paginate(self.db, query)
     
-    async def get_meals_count_by_date_and_meal_type(self, meal_type_id: int, date: str = None) -> int:
-        query = f"""
-        SELECT COUNT(*) FROM meals WHERE meals.meal_type_id = :meal_type_id AND DATE(meals.date_time) = {'DATE()' if not date else 'STRFTIME(:date)'};
-        """
-        return await self.db.fetch_val(query=query, values={"meal_type_id": meal_type_id, "date": date})
-    
+    async def get_meals_by_meal_type(self, meal_type_id: int) -> Page[MealOut]:
+        query = self.models.meals.select().where(self.models.meals.c.meal_type_id == meal_type_id)
+        return await paginate(self.db, query)
+
     async def create_admin(self, admin: AdminIn) -> int:
         query = self.models.admins.insert().values(**admin.dict())
         return await self.db.execute(query)

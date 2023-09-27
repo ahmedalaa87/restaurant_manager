@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from lib.authentication.authentication import Authentication
 from lib.database.manager import DataBaseManager
-from routers import majors, students, meal_types, meals, admins, absences, owners
+from routers import majors, students, meal_types, meals, admins, absences, owners, meal_students
 from lib.sunday_event_handler.sunday_event import EverySundayResetWillStayColumn
 from models.settings_models import Settings
 import datetime
@@ -15,6 +15,7 @@ app.include_router(meals.meals)
 app.include_router(admins.admins)
 app.include_router(absences.absences)
 app.include_router(owners.owners)
+app.include_router(meal_students.meal_students)
 
 add_pagination(app)
 

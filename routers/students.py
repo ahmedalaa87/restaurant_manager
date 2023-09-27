@@ -1,6 +1,6 @@
 from fastapi import APIRouter, status, Depends, Query
 from lib.authentication.authentication import oauth2_scheme, get_current_user
-from models.students_models import StudentIn, StudentOut, StudentUpdate, StudentRfidOut
+from models.students_models import StudentIn, StudentOut, StudentUpdate
 from lib.database.manager import DataBaseManager
 from sqlite3 import IntegrityError
 from lib.checks.checks import student_exists, student_is_stayer
@@ -37,16 +37,6 @@ async def create_student(student: StudentIn, token: str = Depends(oauth2_scheme)
 async def get_student(student_id: int, token: str = Depends(oauth2_scheme)):
     _ = await get_current_user("admin", token=token)
     student = await DataBaseManager().get_student(student_id)
-    if not student:
-        raise StudentNotFound()
-    
-    return student
-
-
-@students.get("/rfid/{rf_id}", response_model=StudentRfidOut, status_code=status.HTTP_200_OK)
-async def get_student_by_rfid(rf_id: int, token: str = Depends(oauth2_scheme)):
-    _ = await get_current_user("admin", token=token)
-    student = await DataBaseManager().get_student_by_rfid(rf_id)
     if not student:
         raise StudentNotFound()
     

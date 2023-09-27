@@ -2,7 +2,7 @@ from sqlalchemy import Date, DateTime, String, Integer, ForeignKey, MetaData, Ta
 
 
 class DbModels:
-    __slots__ = ("metadata", "students", "absences", "majors", "admins", "owners", "meal_types", "meals")
+    __slots__ = ("metadata", "students", "absences", "majors", "admins", "owners", "meal_types", "meals", "meal_students")
 
     def __init__(self, metadata: MetaData) -> None:
         self.metadata = metadata
@@ -16,16 +16,16 @@ class DbModels:
         self._create_owners_table()
         self._create_meal_types_table()
         self._create_meals_table()
+        self._create_meal_students_table()
 
     def _create_students_table(self) -> None:
         self.students = Table(
             "students",
             self.metadata,
             Column("id", Integer, primary_key=True),
-            Column("rf_id", Integer, unique=True),
             Column("name", String),
             Column("entry_year", Integer),
-            Column("major_id", Integer, ForeignKey("majors.id", ondelete="CASCADE")),
+            Column("major_id", ForeignKey("majors.id", ondelete="CASCADE")),
             Column("will_stay", Boolean, server_default="0")
         )
     
@@ -34,7 +34,7 @@ class DbModels:
             "absences",
             self.metadata,
             Column("id", Integer, primary_key=True),
-            Column("student_id", Integer, ForeignKey("students.id", ondelete="CASCADE")),
+            Column("student_id", ForeignKey("students.id", ondelete="CASCADE")),
             Column("date", Date)
         )
     
@@ -80,7 +80,15 @@ class DbModels:
             "meals",
             self.metadata,
             Column("id", Integer, primary_key=True),
-            Column("student_id", Integer, ForeignKey("students.id", ondelete="CASCADE")),
-            Column("meal_type_id", Integer, ForeignKey("meal_types.id", ondelete="CASCADE")),
+            Column("meal_type_id", ForeignKey("meal_types.id", ondelete="CASCADE")),
             Column("date_time", DateTime)
+        )
+    
+    def _create_meal_students_table(self) -> None:
+        self.meal_students = Table(
+            "meal_students",
+            self.metadata,
+            Column("id", Integer, primary_key=True),
+            Column("meal_id", ForeignKey("meals.id", ondelete="CASCADE")),
+            Column("student_id", ForeignKey("students.id", ondelete="CASCADE"))
         )

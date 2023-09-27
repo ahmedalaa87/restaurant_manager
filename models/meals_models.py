@@ -3,19 +3,17 @@ from datetime import datetime
 
 
 class MealIn(BaseModel):
-    student_id: int
     meal_type_id: int
     date_time: datetime = datetime.utcnow()
 
 
 class MealOut(BaseModel):
     id: int
-    student_id: int
     meal_type_id: int
     date_time: datetime
+    students_count: int = 0
 
 
 class MealUpdate(BaseModel):
-    student_id: int
     meal_type_id: int
     date_time: datetime = datetime.utcnow()
