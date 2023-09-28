@@ -50,7 +50,7 @@ class AdminUpdate(BaseModel):
     @validator('role', pre=True)
     def role_validator(cls, role: str):
         role = role.lower()
-        if role not in ['teacher', 'moderator', 'manager']:
+        if role not in ['teacher', 'chief', 'manager']:
             raise ValueError('Role must be teacher, moderator or manager')
         return role
     

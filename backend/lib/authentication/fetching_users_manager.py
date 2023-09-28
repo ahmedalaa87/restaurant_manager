@@ -6,6 +6,7 @@ from lib.exceptions.auth import InvalidCredentials
 if TYPE_CHECKING:
     from models.admins_models import Admin
     from models.owners_models import OwnerOut
+    from models.students_models import StudentOut
 
 
 def role_fetcher_decorator(role_name: str) -> Callable:
@@ -64,3 +65,11 @@ async def fetch_admin(token_data: dict) -> Admin | None:
     admin = await DataBaseManager().get_admin(admin_id)
 
     return admin
+
+
+@role_fetcher_decorator("student")
+async def fetch_student(token_data: dict) -> StudentOut | None:
+    student_id = token_data.get("id")
+    student = await DataBaseManager().get_student(student_id)
+
+    return student
