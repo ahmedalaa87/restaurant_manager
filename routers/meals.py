@@ -42,7 +42,16 @@ async def get_meal(meal_id: int, token: str = Depends(oauth2_scheme)):
     meal = await DataBaseManager().get_meal(meal_id)
     if not meal:
         raise MealNotFound()
-    return meal
+    students = await DataBaseManager().get_meal_students_info(meal_id)
+    return {"id": meal_id, **meal, "students": students}
+
+
+@meals.get("/meal_type/{meal_type_id}", response_model=Page[MealOut])
+async def get_meals_by_meal_type(meal_type_id: int, token: str = Depends(oauth2_scheme)):
+    _ = await get_current_user("admin", token=token)
+    if not await meal_type_exists(meal_type_id):
+        raise MealTypeNotFound()
+    return await DataBaseManager().get_meals_by_meal_type(meal_type_id)
 
 
 @meals.get("/date/{meal_type_id}", response_model=MealOut)
