@@ -76,13 +76,15 @@ async def update_admin(id: int, admin: AdminUpdate, token: str = Depends(oauth2_
     return {**admin.dict(), "id": id}
 
 
-@admins.patch("/reset_password", response_model=AdminOut, status_code=status.HTTP_200_OK)
-async def update_admin_password(admin: AdminPasswordUpdate, token: str = Depends(oauth2_scheme)):
+@admins.patch("/reset_password", status_code=status.HTTP_200_OK)
+async def update_admin_password(passwords_scheme: AdminPasswordUpdate, token: str = Depends(oauth2_scheme)):
     admin = await get_current_user("admin", token=token)
-    if not Authentication.verify_password(admin.old_password, admin.new_password):
+    if not Authentication.verify_password(passwords_scheme.old_password, admin.password):
         raise WrongPassword()
     
-    await DataBaseManager().update_admin_password(id, admin.new_password)
+    new_password = Authentication().get_password_hash(passwords_scheme.new_password)
+    await DataBaseManager().update_admin(admin.id, password=new_password)
+    return {"message": "Password updated"}
 
 
 @admins.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
