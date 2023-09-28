@@ -59,8 +59,11 @@ class DataBaseManager(metaclass=Singleton):
         query = self.models.students.insert().values(**student.dict())
         return await self.db.execute(query)
 
-    async def get_student(self, student_id: int) -> Student:
-        query = self.models.students.select().where(self.models.students.c.id == student_id)
+    async def get_student(self, id_or_email: int | str) -> Student | None:
+        if isinstance(id_or_email, int):
+            query = self.models.students.select().where(self.models.students.c.id == id_or_email)
+        else:
+            query = self.models.students.select().where(self.models.students.c.email == id_or_email)
         return await self.db.fetch_one(query)
     
     async def get_students_by_major(self, major_id: int) -> Page[Student]:
@@ -71,8 +74,8 @@ class DataBaseManager(metaclass=Singleton):
         query = self.models.students.select()
         return await paginate(self.db, query)
     
-    async def update_student(self, student_id: int, student: StudentIn) -> None:
-        query = self.models.students.update().where(self.models.students.c.id == student_id).values(**student.dict())
+    async def update_student(self, student_id: int, **fields) -> None:
+        query = self.models.students.update().where(self.models.students.c.id == student_id).values(**fields)
         await self.db.execute(query)
 
     async def delete_student(self, student_id: int) -> None:
