@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from models.students_models import Student, StudentIn
     from models.meal_types_models import MealTypeIn, MealTypeOut
     from models.meal_students_models import MealStudentIn, MealStudentOut
-    from models.meals_models import MealIn, MealOut
+    from models.meals_models import MealIn, MealOut, MealStudent
     from models.admins_models import AdminIn, Admin
     from models.absences_models import AbsenceIn, Absence
     from models.owners_models import OwnerOut
@@ -110,13 +110,18 @@ class DataBaseManager(metaclass=Singleton):
         query = select([self.models.meals, func.count(self.models.meal_students.c.student_id).label('students_count')]).select_from(self.models.meals.outerjoin(self.models.meal_students, self.models.meals.c.id == self.models.meal_students.c.meal_id)).group_by(self.models.meals.c.id).where(self.models.meals.c.id == meal_id)
         return await self.db.fetch_one(query)
     
+    async def get_meal_students_info(self, meal_id: int) -> list[MealStudent]:
+        query = """SELECT students.id, students.name, students.entry_year FROM students INNER JOIN meal_students ON students.id = meal_students.student_id WHERE meal_students.meal_id = :meal_id;"""
+
+        return await self.db.fetch_all(query=query, values={"meal_id": meal_id})
+    
     async def get_all_meals(self) -> Page[MealOut]:
         query = select([
                     self.models.meals,
                     func.count(self.models.meal_students.c.student_id).label('students_count')
                 ]).select_from(
                     self.models.meals.outerjoin(self.models.meal_students, self.models.meals.c.id == self.models.meal_students.c.meal_id)
-                ).group_by(self.models.meals.c.id)
+                ).group_by(self.models.meals.c.id).order_by(self.models.meals.c.date_time.desc())
         
         return await paginate(self.db, query)
     
@@ -169,7 +174,7 @@ class DataBaseManager(metaclass=Singleton):
         return await paginate(self.db, query)
     
     async def get_meals_by_meal_type(self, meal_type_id: int) -> Page[MealOut]:
-        query = self.models.meals.select().where(self.models.meals.c.meal_type_id == meal_type_id)
+        query = self.models.meals.select().where(self.models.meals.c.meal_type_id == meal_type_id).order_by(self.models.meals.c.date_time.desc())
         return await paginate(self.db, query)
 
     async def create_admin(self, admin: AdminIn) -> int:
