@@ -61,7 +61,7 @@ class StudentDataProvider implements IStudentDataProvider {
   @override
   Future<void> markStudentAsAbsent(int id) async {
     try {
-      final response = await _dio.post("/absences",
+      final response = await _dio.post("/absences/",
           data: {"student_id": id},
           options: Options(
             headers: {

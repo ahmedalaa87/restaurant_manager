@@ -28,7 +28,7 @@ class StudentsPage extends StatelessWidget {
       buildWhen: (oldState, newState) => oldState != newState,
       listenWhen: (oldState, newState) => oldState != newState,
       listener: (context, state) {
-        if (state is StudentsErrorState) {
+        if (state is GetStudentsErrorState) {
           context.showSnackBar(state.message, Colors.red);
         }
       },

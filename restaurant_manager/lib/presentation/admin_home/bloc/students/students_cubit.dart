@@ -34,8 +34,8 @@ class StudentsCubit extends Cubit<StudentsState> {
   }
 
   Future<void> queryStudents(String query) async {
-    final response = await studentService.queryStudents(query.toLowerCase());
     emit(QueryStudentsLoadingState());
+    final response = await studentService.queryStudents(query.toLowerCase());
 
     response.fold(
       (failure) {
@@ -53,6 +53,57 @@ class StudentsCubit extends Cubit<StudentsState> {
           }
         }
         emit(QueryStudentsSuccessState());
+      },
+    );
+  }
+
+  void markStudentAsAbsent(int studentId) async {
+    emit(MarkStudentAsAbsentLoadingState());
+    final response = await studentService.markStudentAsAbsent(studentId);
+    response.fold(
+      (failure) {
+        emit(MarkStudentAsAbsentErrorState(failure.message));
+      },
+      (success) {
+        emit(MarkStudentAsAbsentSuccessState());
+      },
+    );
+  }
+
+  void markStudentAsStayer(int studentId) async {
+    emit(MarkStudentAsStayerLoadingState());
+    final response = await studentService.markStudentAsStayer(studentId);
+    response.fold(
+      (failure) {
+        emit(MarkStudentAsStayerErrorState(failure.message));
+      },
+      (success) {
+        emit(MarkStudentAsStayerSuccessState());
+      },
+    );
+  }
+
+  void unMarkStudentAsAbsent(int studentId) async {
+    final response = await studentService.unMarkStudentAsAbsent(studentId);
+    response.fold(
+      (failure) {
+        emit(UnMarkStudentAsAbsentErrorState(failure.message));
+      },
+      (success) {
+        emit(UnMarkStudentAsAbsentSuccessState());
+      },
+    );
+  }
+
+  void unMarkStudentAsStayer(int studentId) async {
+    emit(UnMarkStudentAsStayerLoadingState());
+    final response = await studentService.unMarkStudentAsStayer(studentId);
+    response.fold(
+      (failure) {
+        emit(UnMarkStudentAsStayerErrorState(failure.message));
+      },
+      (success) {
+        emit(UnMarkStudentAsStayerSuccessState());
       },
     );
   }

@@ -6,7 +6,7 @@ class StudentModel extends Equatable {
   final String name;
   final int entryYear;
 
-  StudentModel({required this.id, required this.name, required this.entryYear});
+  const StudentModel({required this.id, required this.name, required this.entryYear});
 
   factory StudentModel.fromJson(Map<String, dynamic> json) => StudentModel(
     id: json["id"],
