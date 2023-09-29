@@ -1,15 +1,23 @@
 import 'package:restaurant_manager/domain/models/TokenModel.dart';
 import 'package:restaurant_manager/domain/models/UserModel.dart';
 
-class AuthProvider {
+import '../../presentation/shared/constants/login_types.dart';
+
+class AuthInfo {
   static UserModel? user;
   static TokenModel? tokenModel;
+  static LoginTypes? loginType;
 
-  static setUser(UserModel? user) {
-    AuthProvider.user = user;
+  static void setUser(UserModel? user) {
+    AuthInfo.user = user;
   }
 
-  static setTokenModel(TokenModel? tokenModel) {
-    AuthProvider.tokenModel = tokenModel;
+  static void setTokenModel(TokenModel? tokenModel) {
+    AuthInfo.tokenModel = tokenModel;
   }
+
+  static void setLoginType(LoginTypes? loginType) {
+    AuthInfo.loginType = loginType;
+  }
+
 }

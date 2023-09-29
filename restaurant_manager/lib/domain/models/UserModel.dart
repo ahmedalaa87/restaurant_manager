@@ -12,4 +12,11 @@ class UserModel {
     role: json.containsKey("role") ? json["role"] : "student",
     email: json["email"],
   );
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "name": name,
+    "role": role,
+    "email": email,
+  };
 }

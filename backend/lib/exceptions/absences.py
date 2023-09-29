@@ -8,7 +8,7 @@ class AbsenceNotFound(HTTPException):
 
 class StudentIsAlreadyAbsentToday(HTTPException):
     def __init__(self):
-        super().__init__(status_code=status.HTTP_404_NOT_FOUND, detail="Student is already absent today")
+        super().__init__(status_code=status.HTTP_409_CONFLICT, detail="Student is already absent today")
 
 
 class StudentIsAlreadyAbsentAtDate(HTTPException):
@@ -23,7 +23,7 @@ class StudentNotFount(HTTPException):
 
 class StudentIsNotAbsentToday(HTTPException):
     def __init__(self):
-        super().__init__(status_code=status.HTTP_404_NOT_FOUND, detail="Student is not absent today")
+        super().__init__(status_code=status.HTTP_409_CONFLICT, detail="Student is not absent today")
 
 
 class StudentIsNotAbsentAtDate(HTTPException):

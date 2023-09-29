@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:restaurant_manager/presentation/shared/constants/login_types.dart';
 import 'package:restaurant_manager/presentation/shared/extensions/context_extensions.dart';
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({Key? key}) : super(key: key);
+import '../widgets/login_type_button.dart';
+
+class LoginLandingPage extends StatelessWidget {
+  const LoginLandingPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -28,74 +29,11 @@ class LoginPage extends StatelessWidget {
               "Login as a",
               style: context.textTheme.headlineMedium,
             ),
-            Padding(
-              padding: EdgeInsets.symmetric(
-                vertical: 20.h,
-              ),
-              child: TextButton(
-                  onPressed: () {},
-                  child: Text("Student"),
-                  style: TextButton.styleFrom(
-                    backgroundColor: context.colorScheme.primary,
-                    textStyle: context.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                    foregroundColor: context.colorScheme.onPrimary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.r),
-                    ),
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 30.w,
-                      vertical: 20.h,
-                    ),
-                  ),
-              ),
+            const LoginTypeButton(
+              type: LoginTypes.student,
             ),
-            Padding(
-              padding: EdgeInsets.symmetric(
-                vertical: 20.h,
-              ),
-              child: TextButton(
-                onPressed: () {},
-                child: Text("Student"),
-                style: TextButton.styleFrom(
-                  backgroundColor: context.colorScheme.primary,
-                  textStyle: context.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                  foregroundColor: context.colorScheme.onPrimary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.r),
-                  ),
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 30.w,
-                    vertical: 20.h,
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(
-                vertical: 20.h,
-              ),
-              child: TextButton(
-                onPressed: () {},
-                child: Text("Student"),
-                style: TextButton.styleFrom(
-                  backgroundColor: context.colorScheme.primary,
-                  textStyle: context.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                  foregroundColor: context.colorScheme.onPrimary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.r),
-                  ),
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 30.w,
-                    vertical: 20.h,
-                  ),
-                ),
-              ),
+            const LoginTypeButton(
+              type: LoginTypes.admin,
             ),
           ],
         ),

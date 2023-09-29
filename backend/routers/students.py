@@ -40,6 +40,11 @@ async def get_all_students(token: str = Depends(oauth2_scheme)):
     _ = await get_current_user("admin", token=token)
     return await DataBaseManager().get_all_students()
 
+@students.get("/search/{query}", response_model=Page[StudentOut], status_code=status.HTTP_200_OK)
+async def search_students(query: str, token: str = Depends(oauth2_scheme)):
+    _ = await get_current_user("admin", token=token)
+    return await DataBaseManager().query_students(query)
+
 
 @students.put("/{student_id}", response_model=StudentOut, status_code=status.HTTP_200_OK)
 async def update_student(student_id: int, student: StudentUpdate, token: str = Depends(oauth2_scheme)):
@@ -84,6 +89,7 @@ async def update_will_stay(student_id: int, token: str = Depends(oauth2_scheme))
         
     await DataBaseManager().set_will_stay(student_id)
     return {"message": "Student will stay"}
+    
 
 
 @students.put("/will_not_stay/{student_id}", status_code=status.HTTP_200_OK)
