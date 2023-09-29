@@ -103,6 +103,7 @@ class AuthDataProvider implements IAuthDataProvider {
 
   @override
   Future<TokenModel> refreshStudentToken(String refreshToken) async {
+    print("refreshStudentToken");
     try {
       final response = await _dio.post("/students/refresh",
           options: Options(headers: {

@@ -1,4 +1,5 @@
 import '../../../../domain/models/MealModel.dart';
+import '../../../../domain/models/StudentModel.dart';
 
 class MealsState {}
 
@@ -16,10 +17,9 @@ class GetAllMealsLoading extends MealsState {}
 
 class GetAllMealsSuccess extends MealsState {}
 
-class GetAllMealsError extends MealsState {
-  final String message;
+class GetAllMealsError extends MealsError {
 
-  GetAllMealsError(this.message);
+  GetAllMealsError(super.message);
 }
 
 class GetMealByIdLoading extends MealsState {}
@@ -30,9 +30,34 @@ class GetMealByIdSuccess extends MealsState {
   GetMealByIdSuccess({required this.meal});
 }
 
-class GetMealByIdError extends MealsState {
-  final String message;
+class GetMealByIdError extends MealsError {
 
-  GetMealByIdError(this.message);
+  GetMealByIdError(super.message);
 }
+
+class CreateMealLoadingState extends MealsState {}
+
+class CreateMealSuccessState extends MealsState {
+  final MealModel meal;
+
+  CreateMealSuccessState({required this.meal});
+}
+
+class CreateMealErrorState extends MealsError {
+  CreateMealErrorState(super.message);
+
+}
+
+class AddStudentToMealLoadingState extends MealsLoading {}
+
+class AddStudentToMealSuccessState extends MealsState {
+  final StudentModel student;
+
+  AddStudentToMealSuccessState({required this.student});
+}
+
+class AddStudentToMealErrorState extends MealsError {
+  AddStudentToMealErrorState(super.message);
+}
+
 

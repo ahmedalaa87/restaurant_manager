@@ -7,12 +7,16 @@ class DataOptionsListWidget extends StatefulWidget {
   final List<String> optionValues;
   final void Function(String?) onChanged;
   final String currentValue;
+  final double width;
+  final double height;
 
   const DataOptionsListWidget({
     Key? key,
     required this.optionValues,
     required this.onChanged,
     required this.currentValue,
+    this.width = 150,
+    this.height = 32,
   }) : super(key: key);
 
   @override
@@ -23,8 +27,8 @@ class _DataOptionsListWidgetState extends State<DataOptionsListWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 150.w,
-      height: 32.h,
+      width: widget.width.w,
+      height: widget.height.h,
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
@@ -40,16 +44,16 @@ class _DataOptionsListWidgetState extends State<DataOptionsListWidget> {
           items: widget.optionValues
               .map(
                 (value) => DropdownMenuItem(
-              value: value,
-              child: Text(
-                value,
-              ),
-            ),
-          )
+                  value: value,
+                  child: Text(
+                    value,
+                  ),
+                ),
+              )
               .toList(),
           onChanged: widget.onChanged,
-          icon:
-          Icon(Icons.arrow_drop_down_sharp, color: context.colorScheme.onPrimary),
+          icon: Icon(Icons.arrow_drop_down_sharp,
+              color: context.colorScheme.onPrimary),
           style: context.theme.textTheme.titleMedium,
           dropdownDecoration: BoxDecoration(
             color: context.colorScheme.primary,

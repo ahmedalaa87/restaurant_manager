@@ -4,13 +4,17 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:restaurant_manager/domain/models/MealModel.dart';
 import 'package:restaurant_manager/presentation/admin_home/bloc/meals/meals_cubit.dart';
 import 'package:restaurant_manager/presentation/admin_home/bloc/meals/meals_states.dart';
+import 'package:restaurant_manager/presentation/admin_home/pages/CreateMeal.dart';
 import 'package:restaurant_manager/presentation/authentication/bloc/authentication_cubit.dart';
 import 'package:restaurant_manager/presentation/shared/extensions/context_extensions.dart';
 
 import '../../../domain/constatns/mealTypes.dart';
+import '../../../router/routes.dart';
+import '../../shared/widgets/CreateNewButton.dart';
 import '../../shared/widgets/DataCard.dart';
 import '../../shared/widgets/loading_indicator.dart';
 import '../widgets/data_option_list.dart';
+import 'MealPage.dart';
 
 class MealsPage extends StatelessWidget {
   const MealsPage({Key? key}) : super(key: key);
@@ -61,6 +65,13 @@ class MealsPage extends StatelessWidget {
             titleTextStyle: context.theme.textTheme.headlineMedium
                 ?.copyWith(color: context.colorScheme.onPrimary),
           ),
+            floatingActionButton: CreateNewButton(
+              onResultCallBack: (mealId) {
+                context.pushNamed(Routes.meal, arguments: MealPageArgs(mealId: mealId));
+              },
+              toShowScreen: const CreateMeal(),
+              heroTag: "meals",
+            ),
           body: state is GetAllMealsLoading &&
               mealsCubit.meals.isEmpty
               ? const Center(child: LoadingIndicator())

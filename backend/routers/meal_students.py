@@ -21,7 +21,8 @@ async def create_meal_student(meal_student: MealStudentIn, token: str = Depends(
     meal = await DataBaseManager().get_meal(meal_student.meal_id)
     if not meal:
         raise MealNotFound()
-    if not await student_exists(meal_student.student_id):
+    student = await DataBaseManager().get_student(meal_student.student_id)
+    if not student:
         raise StudentNotFound()
     if await student_has_meal_today(meal_student.student_id, meal_student.meal_id):
         raise StudentAlreadyHasMeal()
@@ -36,44 +37,3 @@ async def create_meal_student(meal_student: MealStudentIn, token: str = Depends(
     meal_student_id = await DataBaseManager().create_meal_student(meal_student)
     return {"id": meal_student_id, **meal_student.dict()}
 
-
-@meal_students.post("/force", response_model=MealStudentOut, status_code=status.HTTP_201_CREATED)
-async def force_create_meal_student(meal_student: MealStudentIn, token: str = Depends(oauth2_scheme)):
-    _ = await get_current_user("admin", token=token)
-    if not await meal_exists(meal_student.meal_id):
-        raise MealNotFound()
-    if not await student_exists(meal_student.student_id):
-        raise StudentNotFound()
-    meal_student_id = await DataBaseManager().create_meal_student(meal_student)
-    return {"id": meal_student_id, **meal_student.dict()}
-
-
-@meal_students.get("/{meal_id}", response_model=Page[MealStudentOut])
-async def get_meal_students_by_meal(meal_id: int, token: str = Depends(oauth2_scheme)):
-    _ = await get_current_user("admin", token=token)
-    if not await meal_exists(meal_id):
-        raise MealNotFound()
-    return await DataBaseManager().get_all_meal_students(meal_id)
-
-
-@meal_students.delete("/{meal_student_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_meal_student(meal_student_id: int, token: str = Depends(oauth2_scheme)):
-    _ = await get_current_user("admin", token=token)
-    if not await meal_student_exists(meal_student_id):
-        raise MealStudentNotFound()
-    await DataBaseManager().delete_meal_student(meal_student_id)
-
-
-@meal_students.put("/{meal_student_id}", response_model=MealStudentOut)
-async def update_meal_student(meal_student_id: int, meal_student: MealStudentUpdate, token: str = Depends(oauth2_scheme)):
-    _ = await get_current_user("admin", token=token)
-    if not await meal_student_exists(meal_student_id):
-        raise MealStudentNotFound()
-    if not await meal_exists(meal_student.meal_id):
-        raise MealNotFound()
-    if not await student_exists(meal_student.student_id):
-        raise StudentNotFound()
-    if await student_has_meal_today(meal_student.student_id, meal_student.meal_id):
-        raise StudentAlreadyHasMeal()
-    await DataBaseManager().update_meal_student(meal_student_id, meal_student)
-    return {"id": meal_student_id, **meal_student.dict()}

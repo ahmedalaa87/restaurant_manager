@@ -5,11 +5,14 @@ import 'package:restaurant_manager/infrastructure/data_providers/shared/end_poin
 import 'package:restaurant_manager/infrastructure/data_providers/shared/exceptions.dart';
 import 'package:restaurant_manager/infrastructure/data_providers/shared/interceptors.dart';
 
+import '../../domain/models/StudentModel.dart';
 import '../auth/AuthInfo.dart';
 
 abstract class IMealsDataProvider {
   Future<List<MealModel>> getMeals(int page, MealTypes? mealTypes);
   Future<MealModel> getMeal(int id);
+  Future<MealModel> createMeal(MealTypes mealType);
+  Future<StudentModel> addStudentToMeal(int studentId, int mealId);
 }
 
 class MealsDataProvider extends IMealsDataProvider {
@@ -67,6 +70,59 @@ class MealsDataProvider extends IMealsDataProvider {
 
       List<Map<String, dynamic>> meals = (response.data["items"] as List).cast<Map<String, dynamic>>();
       return meals.map(MealModel.fromJson).toList();
+    } on DioError {
+      throw ServerException();
+    }
+  }
+
+  @override
+  Future<MealModel> createMeal(MealTypes mealType) async {
+    try {
+      final response = await _dio.post("/",
+          data: {"meal_type_id": mealType.id},
+          options: Options(headers: {
+            "Authorization": "Bearer ${AuthInfo.tokenModel!.accessToken}",
+          }));
+
+      if (response.statusCode == 401) {
+        throw InvalidAccessTokenException();
+      }
+
+      if (response.statusCode == 404) {
+        throw MealTypeNotFoundException();
+      }
+
+      return MealModel.fromJson(response.data);
+    } on DioError {
+      throw ServerException();
+    }
+  }
+
+  @override
+  Future<StudentModel> addStudentToMeal(int studentId, int mealId) async {
+    try {
+      final response = await _dio.put("/add_student",
+          data: {
+            "student_id": studentId,
+            "meal_id": mealId
+          },
+          options: Options(headers: {
+            "Authorization": "Bearer ${AuthInfo.tokenModel!.accessToken}",
+          }));
+
+      if (response.statusCode == 401) {
+        throw InvalidAccessTokenException();
+      }
+
+      if (response.statusCode == 404) {
+        throw StudentNotFoundException();
+      }
+
+      if (response.statusCode == 400) {
+        throw AddStudentToMealBadRequestException(response.data["detail"]);
+      }
+
+      return StudentModel.fromJson(response.data);
     } on DioError {
       throw ServerException();
     }

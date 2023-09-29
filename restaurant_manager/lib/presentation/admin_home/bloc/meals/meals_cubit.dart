@@ -45,6 +45,50 @@ class MealsCubit extends Cubit<MealsState> {
     });
   }
 
+  void createMeal(MealTypes mealType) {
+    emit(CreateMealLoadingState());
+    mealsService.createMeal(mealType).then((response) {
+      response.fold(
+        (failure) => emit(
+          CreateMealErrorState(
+            failure.message,
+          ),
+        ),
+        (meal) {
+          meals.insert(0, meal);
+          emit(
+            CreateMealSuccessState(meal: meal),
+          );
+        },
+      );
+    });
+  }
+
+  void addStudentToMeal(int studentId, int mealId) {
+    emit(AddStudentToMealLoadingState());
+    mealsService.addStudentToMeal(studentId, mealId).then((response) {
+      response.fold(
+        (failure) => emit(
+          AddStudentToMealErrorState(
+            failure.message,
+          ),
+        ),
+        (student) {
+          try {
+            MealModel meal = meals.firstWhere((element) => element.id == mealId);
+            meal.students.add(student);
+            meal.studentCount += 1;
+          } catch (_) {
+
+          }
+          emit(
+            AddStudentToMealSuccessState(student: student),
+          );
+        },
+      );
+    });
+  }
+
   void changeMealType(MealTypes? mealsType) async {
     this.mealsType = mealsType;
     clear();

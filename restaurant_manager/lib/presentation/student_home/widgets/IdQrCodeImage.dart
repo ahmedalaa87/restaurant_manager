@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:restaurant_manager/core/extensions.dart';
 import 'package:restaurant_manager/presentation/shared/extensions/context_extensions.dart';
 
 class IdQrCodeImage extends StatefulWidget {
@@ -30,13 +31,13 @@ class _IdQrCodeImageState extends State<IdQrCodeImage> {
   Widget build(BuildContext context) {
     if (!_loopStarted) {
       _loopStarted = true;
-      startRefreshLoop(60000);
+      startRefreshLoop(5 * 60 * 1000);
     }
 
     return QrImageView(
       data: jsonEncode({
         "id": widget.id,
-        "timestamp": DateTime.now().toUtc().millisecondsSinceEpoch,
+        "timestamp": DateTime.now().toUtc().timeStamp,
       },),
       size: 350.w,
       backgroundColor: context.colorScheme.primary,

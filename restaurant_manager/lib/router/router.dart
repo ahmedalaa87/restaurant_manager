@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:restaurant_manager/presentation/admin_home/pages/MealPage.dart';
+import 'package:restaurant_manager/presentation/admin_home/pages/QrReaderPage.dart';
 import 'package:restaurant_manager/presentation/authentication/pages/login_landing_page.dart';
 import 'package:restaurant_manager/presentation/shared/constants/login_types.dart';
 import 'package:restaurant_manager/router/routes.dart';
@@ -47,6 +48,8 @@ class AppRouter {
         return StudentPage(student: args.student);
       case Routes.studentSearch:
         return const StudentsSearchPage();
+      case Routes.qrCodeReader:
+        return const QrReaderPage();
       default:
         return null;
     }

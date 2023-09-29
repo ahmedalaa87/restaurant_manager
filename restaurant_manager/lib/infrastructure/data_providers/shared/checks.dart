@@ -8,5 +8,5 @@ bool checkTokenIntegrity(String token) {
 }
 
 bool _checkIfTokenIsExpired(Map<String, dynamic> payload) {
-  return payload["exp"] - 60 < getCurrentTimeStamp();
+  return payload["exp"] + 60 < getCurrentTimeStamp();
 }

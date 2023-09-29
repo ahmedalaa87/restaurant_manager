@@ -12,7 +12,6 @@ void onRequestInterceptor(
   if (accessToken == null) {
     return handler.next(options);
   }
-
   if (checkTokenIntegrity(accessToken)) {
     return handler.next(options);
   }

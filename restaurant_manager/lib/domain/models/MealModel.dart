@@ -6,7 +6,7 @@ class MealModel {
   final int id;
   final MealTypes mealType;
   final DateTime date;
-  final int studentCount;
+  int studentCount;
   final List<StudentModel> students;
 
   MealModel(

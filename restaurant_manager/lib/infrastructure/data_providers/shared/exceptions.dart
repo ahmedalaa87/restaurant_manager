@@ -19,3 +19,10 @@ class StudentIsAlreadyMarkedAsStayerException implements Exception {}
 class StudentIsNotAbsentTodayException implements Exception {}
 
 class StudentIsNotMarkedAsAStayerException implements Exception {}
+
+class MealTypeNotFoundException implements Exception {}
+
+class AddStudentToMealBadRequestException implements Exception {
+  final String message;
+  AddStudentToMealBadRequestException(this.message);
+}

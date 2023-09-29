@@ -84,6 +84,7 @@ class StudentsCubit extends Cubit<StudentsState> {
   }
 
   void unMarkStudentAsAbsent(int studentId) async {
+    emit(UnMarkStudentAsAbsentLoadingState());
     final response = await studentService.unMarkStudentAsAbsent(studentId);
     response.fold(
       (failure) {

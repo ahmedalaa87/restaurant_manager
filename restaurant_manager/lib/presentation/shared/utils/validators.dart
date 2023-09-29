@@ -26,6 +26,23 @@ String? validatePositiveDouble(String? input) {
   return null;
 }
 
+String? validatePositiveInt(String? input) {
+  if (input == null || input.isEmpty) {
+    return "This field mustn't be empty";
+  }
+
+  int? value = int.tryParse(input);
+  if (value == null) {
+    return "This field must be a positive number";
+  }
+
+  if (value <= 0) {
+    return "This field must have a positive value";
+  }
+
+  return null;
+}
+
 String? validatePositiveDoubleOrZero(String? input) {
   if (input == null || input.isEmpty) {
     return "This field mustn't be empty";
