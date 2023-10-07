@@ -1,4 +1,4 @@
 class EndPoints {
-  static const String serverUrl = "http://192.168.1.10:8000";
+  static const String serverUrl = "http://remix.uksouth.cloudapp.azure.com:3000";
   static const String meals = "$serverUrl/meals";
 }

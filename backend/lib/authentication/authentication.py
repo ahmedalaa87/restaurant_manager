@@ -42,13 +42,13 @@ class Authentication(metaclass=Singleton):
 
     def create_access_token(self, data: dict) -> str:
         to_encode = data.copy()
-        expire_time = datetime.now() + timedelta(minutes=self.access_token_expire_mins)
+        expire_time = datetime.utcnow() + timedelta(minutes=self.access_token_expire_mins)
         to_encode["exp"] = expire_time.timestamp()
         return jwt.encode(to_encode, self.access_token_secret_key, algorithm=self.algorithm)
 
     def create_refresh_token(self, data: dict) -> str:
         to_encode = data.copy()
-        expire_time = datetime.now() + timedelta(days=self.refresh_token_expire_days)
+        expire_time = datetime.utcnow() + timedelta(days=self.refresh_token_expire_days)
         to_encode["exp"] = expire_time.timestamp()
         return jwt.encode(to_encode, self.refresh_token_secret_key, algorithm=self.algorithm)
 

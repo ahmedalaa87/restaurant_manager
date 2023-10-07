@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:restaurant_manager/application/errors/AuthErrors.dart';
 import 'package:restaurant_manager/application/services/auth/IAuthService.dart';
 import 'package:restaurant_manager/presentation/admin_home/bloc/meals/meals_cubit.dart';
-import 'package:restaurant_manager/presentation/admin_home/bloc/meals/meals_states.dart';
-import 'package:restaurant_manager/presentation/admin_home/bloc/students/students_cubit.dart';
 import 'package:restaurant_manager/presentation/admin_home/bloc/students/students_cubit.dart';
 import 'package:restaurant_manager/presentation/authentication/bloc/authentication_cubit.dart';
-import 'package:restaurant_manager/presentation/authentication/bloc/authentication_states.dart';
-import 'package:restaurant_manager/presentation/shared/extensions/context_extensions.dart';
 import 'package:restaurant_manager/router/router.dart';
 import 'package:restaurant_manager/router/routes.dart';
 import 'dependency_container.dart' as dc;

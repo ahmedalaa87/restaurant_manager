@@ -1,10 +1,10 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from datetime import datetime
 
 
 class MealIn(BaseModel):
     meal_type_id: int
-    date_time: datetime = datetime.utcnow()
+    date_time: datetime = Field(default_factory=datetime.utcnow)
 
 
 class MealStudent(BaseModel):
@@ -23,4 +23,4 @@ class MealOut(BaseModel):
 
 class MealUpdate(BaseModel):
     meal_type_id: int
-    date_time: datetime = datetime.utcnow()
+    date_time: datetime = Field(default_factory=datetime.utcnow)

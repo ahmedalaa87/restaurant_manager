@@ -92,6 +92,10 @@ class MealsDataProvider extends IMealsDataProvider {
         throw MealTypeNotFoundException();
       }
 
+      if (response.statusCode == 409) {
+        throw MealWithTypeAlreadyCreatedTodayExecption();
+      }
+
       return MealModel.fromJson(response.data);
     } on DioError {
       throw ServerException();

@@ -44,3 +44,7 @@ async def student_is_absent_at_date(student_id: int, date: str) -> bool:
 async def student_is_stayer(student_id: int) -> bool:
     student = await DataBaseManager().get_student(student_id)
     return True if student.will_stay else False
+
+async def meal_type_created_today(meal_type: int) -> bool:
+    meal = await DataBaseManager().get_meal_by_date_and_meal_type(meal_type)
+    return meal is not None

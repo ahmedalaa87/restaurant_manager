@@ -40,7 +40,7 @@ class _IdQrCodeImageState extends State<IdQrCodeImage> {
         "timestamp": DateTime.now().toUtc().timeStamp,
       },),
       size: 350.w,
-      backgroundColor: context.colorScheme.primary,
+      backgroundColor: Colors.white,
     );
   }
 }

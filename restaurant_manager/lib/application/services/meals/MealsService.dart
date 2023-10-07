@@ -113,6 +113,8 @@ class MealsService implements IMealsService {
     return Left(InvalidAccessTokenError());
     } on MealTypeNotFoundException {
       return Left(MealTypeNotFoundError());
+    } on MealWithTypeAlreadyCreatedTodayExecption {
+      return Left(MealWithTypeAlreadyCreatedTodayError());
     }
   }
 

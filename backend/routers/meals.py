@@ -2,6 +2,7 @@ from fastapi import APIRouter, status, Depends, Query
 from lib.authentication.authentication import oauth2_scheme, get_current_user
 from lib.checks.checks import (
     meal_exists,
+    meal_type_created_today,
     meal_type_exists,
     student_has_meal_today,
     student_is_absent_today,
@@ -33,6 +34,10 @@ async def create_meal(meal: MealIn, token: str = Depends(oauth2_scheme)):
     _ = await get_current_user("admin", token=token)
     if not await meal_type_exists(meal.meal_type_id):
         raise MealTypeNotFound()
+
+    if await meal_type_created_today(meal.meal_type_id):
+        raise 
+
     meal_id = await DataBaseManager().create_meal(meal)
     return {"id": meal_id, **meal.dict()}
 
