@@ -17,6 +17,7 @@ class TokenTypes(Enum):
 pwd_context = CryptContext(["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
+
 class Authentication(metaclass=Singleton):
     def __init__(
         self,
@@ -24,8 +25,8 @@ class Authentication(metaclass=Singleton):
         refresh_token_secret_key: str,
         algorithm: str,
         access_token_expire_mins: int,
-        refresh_token_expire_days: int
-        ) -> None:
+        refresh_token_expire_days: int,
+    ) -> None:
         self.access_token_secret_key = access_token_secret_key
         self.refresh_token_secret_key = refresh_token_secret_key
         self.algorithm = algorithm
@@ -42,15 +43,21 @@ class Authentication(metaclass=Singleton):
 
     def create_access_token(self, data: dict) -> str:
         to_encode = data.copy()
-        expire_time = datetime.utcnow() + timedelta(minutes=self.access_token_expire_mins)
+        expire_time = datetime.now() + timedelta(
+            minutes=self.access_token_expire_mins
+        )
         to_encode["exp"] = expire_time.timestamp()
-        return jwt.encode(to_encode, self.access_token_secret_key, algorithm=self.algorithm)
+        return jwt.encode(
+            to_encode, self.access_token_secret_key, algorithm=self.algorithm
+        )
 
     def create_refresh_token(self, data: dict) -> str:
         to_encode = data.copy()
-        expire_time = datetime.utcnow() + timedelta(days=self.refresh_token_expire_days)
+        expire_time = datetime.now() + timedelta(days=self.refresh_token_expire_days)
         to_encode["exp"] = expire_time.timestamp()
-        return jwt.encode(to_encode, self.refresh_token_secret_key, algorithm=self.algorithm)
+        return jwt.encode(
+            to_encode, self.refresh_token_secret_key, algorithm=self.algorithm
+        )
 
     def refresh_token(self, refresh_token: str) -> tuple[str, str]:
         payload = self.get_token_data(refresh_token, TokenTypes.REFRESH_TOKEN)
@@ -59,7 +66,11 @@ class Authentication(metaclass=Singleton):
         return access_token, new_refresh_token
 
     def get_token_data(self, token: str, type: TokenTypes) -> dict:
-        secret_key = self.access_token_secret_key if type == TokenTypes.ACCESS_TOKEN else self.refresh_token_secret_key
+        secret_key = (
+            self.access_token_secret_key
+            if type == TokenTypes.ACCESS_TOKEN
+            else self.refresh_token_secret_key
+        )
         try:
             payload = jwt.decode(token, secret_key, algorithms=[self.algorithm])
             id = payload.get("id")

@@ -9,6 +9,7 @@ from lib.checks.checks import (
     student_is_stayer,
 )
 from lib.exceptions.meal_students import (
+    MealExpired,
     StudentAlreadyHasMeal,
     StudentIsAbsent,
     StudentIsNotStayer,
@@ -97,6 +98,10 @@ async def create_meal_student(
         raise StudentNotFound()
     if await student_has_meal_today(meal_student.student_id, meal_student.meal_id):
         raise StudentAlreadyHasMeal()
+
+    if (meal.date_time - datetime.utcnow()).seconds >= 10800:
+        raise MealExpired()
+    
     if (
         await student_is_absent_today(meal_student.student_id)
         and meal.meal_type_id == 2
