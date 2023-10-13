@@ -5,7 +5,9 @@ import 'package:restaurant_manager/domain/models/MealModel.dart';
 import 'package:restaurant_manager/presentation/admin_home/pages/StudentPage.dart';
 import 'package:restaurant_manager/presentation/shared/extensions/context_extensions.dart';
 import 'package:restaurant_manager/router/routes.dart';
+import '../../../domain/constatns/userRoles.dart';
 import '../../../domain/models/StudentModel.dart';
+import '../../../infrastructure/auth/AuthInfo.dart';
 import '../../admin_home/pages/MealPage.dart';
 import 'PropertyHolder.dart';
 
@@ -39,6 +41,8 @@ class DataCard extends StatefulWidget {
   factory DataCard.fromStudent(StudentModel student, BuildContext context) {
     return DataCard(
       onTap: () {
+        if (AuthInfo.user?.role != UserRoles.teacher &&
+            AuthInfo.user?.role != UserRoles.manager) return;
         context.pushNamed(
           Routes.student,
           arguments: StudentPageArgs(
@@ -50,6 +54,7 @@ class DataCard extends StatefulWidget {
       data: {
         "Name": student.name,
         "Grade": student.gradeYear.toString(),
+        "Major": student.major
       },
     );
   }

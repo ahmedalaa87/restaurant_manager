@@ -28,6 +28,13 @@ class StudentIsAbsent(HTTPException):
         )
 
 
+class StudentIsWeekAbsent(HTTPException):
+    def __init__(self):
+        super().__init__(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Student is absent this week"
+        )
+
+
 class StudentIsNotStayer(HTTPException):
     def __init__(self):
         super().__init__(
@@ -40,3 +47,10 @@ class MealExpired(HTTPException):
         super().__init__(
             status_code=status.HTTP_400_BAD_REQUEST, detail="The meal is expired"
         )
+
+
+class InvalidQrCode(HTTPException):
+    def __init__(self):
+       super().__init__(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="The provided qr code is invalid"
+        ) 

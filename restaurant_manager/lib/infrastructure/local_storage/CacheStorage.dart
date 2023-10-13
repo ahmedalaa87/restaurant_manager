@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:restaurant_manager/infrastructure/local_storage/constants.dart';
-import 'package:restaurant_manager/presentation/shared/constants/login_types.dart';
+import 'package:restaurant_manager/core/constants/login_types.dart';
 
 import '../../domain/models/TokenModel.dart';
 import '../../domain/models/UserModel.dart';

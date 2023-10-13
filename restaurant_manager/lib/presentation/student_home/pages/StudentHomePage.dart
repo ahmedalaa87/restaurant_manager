@@ -5,6 +5,7 @@ import 'package:restaurant_manager/presentation/authentication/bloc/authenticati
 import 'package:restaurant_manager/presentation/authentication/bloc/authentication_states.dart';
 import 'package:restaurant_manager/presentation/shared/extensions/context_extensions.dart';
 
+import '../../../router/routes.dart';
 import '../widgets/IdQrCodeImage.dart';
 
 class StudentHomePage extends StatelessWidget {
@@ -31,17 +32,15 @@ class StudentHomePage extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
                 actions: [
-                  TextButton(
+                  IconButton(
+                    onPressed: () {
+                      context.pushNamed(Routes.changePassword);
+                    },
+                    icon: Icon(Icons.key, color: context.colorScheme.onPrimary,),
+                  ),
+                  IconButton(
                       onPressed: state is AuthLoadingState ? null :  authCubit.logout,
-                      style: TextButton.styleFrom(
-                        backgroundColor: Colors.red,
-                      ),
-                      child: Text(
-                        "Logout",
-                        style: context.textTheme.titleMedium?.copyWith(
-                          color: Colors.white,
-                        ),
-                      )
+                      icon: Icon(Icons.logout, color: context.colorScheme.onPrimary,),
                   )
                 ],
               ),

@@ -15,9 +15,13 @@ abstract class IStudentDataProvider {
 
   Future<void> markStudentAsStayer(int id);
 
+  Future<void> markStudentAsWeekAbsent(int id);
+
   Future<void> unMarkStudentAsAbsent(int id);
 
   Future<void> unMarkStudentAsStayer(int id);
+
+  Future<void> unMarkStudentAsWeekAbsent(int id);
 }
 
 class StudentDataProvider implements IStudentDataProvider {
@@ -183,6 +187,64 @@ class StudentDataProvider implements IStudentDataProvider {
 
       if (response.statusCode == 409) {
         throw StudentIsNotMarkedAsAStayerException();
+      }
+    } on DioError {
+      throw ServerException();
+    }
+  }
+
+  @override
+  Future<void> unMarkStudentAsWeekAbsent(int id) async {
+    try {
+      final response = await _dio.put("/students/remove_week_absent/$id",
+          options: Options(
+              headers: {
+                "Authorization": "Bearer ${AuthInfo.tokenModel!.accessToken}",
+              }));
+
+      if (response.statusCode == 401) {
+        throw InvalidAccessTokenException();
+      }
+
+      if (response.statusCode == 404) {
+        throw StudentNotFoundException();
+      }
+
+      if (response.statusCode == 400) {
+        throw CanNotUpdateWeekAbsentsAtWeekendsException();
+      }
+
+      if (response.statusCode == 409) {
+        throw StudentIsNotMarkedAsWeekAbsentException();
+      }
+    } on DioError {
+      throw ServerException();
+    }
+  }
+
+  @override
+  Future<void> markStudentAsWeekAbsent(int id) async {
+    try {
+      final response = await _dio.put("/students/week_absent/$id",
+          options: Options(
+              headers: {
+                "Authorization": "Bearer ${AuthInfo.tokenModel!.accessToken}",
+              }));
+
+      if (response.statusCode == 401) {
+        throw InvalidAccessTokenException();
+      }
+
+      if (response.statusCode == 404) {
+        throw StudentNotFoundException();
+      }
+
+      if (response.statusCode == 400) {
+        throw CanNotUpdateWeekAbsentsAtWeekendsException();
+      }
+
+      if (response.statusCode == 409) {
+        throw StudentIsAlreadyMarkedAsWeekAbsentException();
       }
     } on DioError {
       throw ServerException();

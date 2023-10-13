@@ -1,6 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:restaurant_manager/presentation/authentication/bloc/authentication_states.dart';
-import 'package:restaurant_manager/presentation/shared/constants/login_types.dart';
+import 'package:restaurant_manager/core/constants/login_types.dart';
 
 import '../../../application/services/auth/IAuthService.dart';
 
@@ -14,6 +14,22 @@ class AuthCubit extends Cubit<AuthState> {
     response.fold(
       (error) => emit(AuthLoginErrorState(error.message)),
       (tokenModel) => emit(AuthLoginSuccessState()),
+    );
+  }
+
+  void changePassword(String currentPassword, String newPassword) async {
+    emit(ChangePasswordLoadingState());
+    final response =
+        await authService.changePassword(currentPassword, newPassword);
+    response.fold(
+      (error) => emit(
+        ChangePasswordErrorState(
+          error.message,
+        ),
+      ),
+      (_) => emit(
+        ChangePasswordSuccessState(),
+      ),
     );
   }
 

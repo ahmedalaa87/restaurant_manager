@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:restaurant_manager/presentation/shared/constants/login_types.dart';
+import 'package:restaurant_manager/core/constants/login_types.dart';
 import 'package:restaurant_manager/presentation/shared/extensions/context_extensions.dart';
 
 import '../widgets/login_type_button.dart';

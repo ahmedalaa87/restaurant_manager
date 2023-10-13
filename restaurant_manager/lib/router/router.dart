@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:restaurant_manager/presentation/admin_home/pages/MealPage.dart';
 import 'package:restaurant_manager/presentation/admin_home/pages/QrReaderPage.dart';
 import 'package:restaurant_manager/presentation/authentication/pages/login_landing_page.dart';
-import 'package:restaurant_manager/presentation/shared/constants/login_types.dart';
+import 'package:restaurant_manager/core/constants/login_types.dart';
 import 'package:restaurant_manager/router/routes.dart';
 
 import '../infrastructure/auth/AuthInfo.dart';
@@ -10,6 +10,7 @@ import '../presentation/admin_home/pages/AdminHomePage.dart';
 import '../presentation/admin_home/pages/StudentPage.dart';
 import '../presentation/admin_home/pages/StudentsSearchPage.dart';
 import '../presentation/authentication/pages/login_page.dart';
+import '../presentation/student_home/pages/ChangePasswordPage.dart';
 import '../presentation/student_home/pages/StudentHomePage.dart';
 import '../themes/dark_theme.dart';
 
@@ -29,7 +30,6 @@ class AppRouter {
   }
 
   static Widget? getScreenFromRouteName(String? name, dynamic args) {
-    print(name);
     switch (name) {
       case Routes.root:
         if (AuthInfo.tokenModel != null && AuthInfo.user != null) {
@@ -50,6 +50,8 @@ class AppRouter {
         return const StudentsSearchPage();
       case Routes.qrCodeReader:
         return const QrReaderPage();
+      case Routes.changePassword:
+        return const ChangePasswordPage();
       default:
         return null;
     }

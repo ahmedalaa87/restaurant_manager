@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:restaurant_manager/presentation/authentication/pages/login_page.dart';
-import 'package:restaurant_manager/presentation/shared/constants/login_types.dart';
+import 'package:restaurant_manager/core/constants/login_types.dart';
 import 'package:restaurant_manager/presentation/shared/extensions/context_extensions.dart';
 import 'package:restaurant_manager/router/routes.dart';
 

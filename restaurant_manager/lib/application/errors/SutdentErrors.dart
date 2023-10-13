@@ -7,6 +7,9 @@ class StudentErrorMessage {
   static const String studentIsNotMarkedAsAbsent = "Student is not marked as absent";
   static const String studentIsNotMarkedAsStayer = "Student is not marked as stayer";
   static const String canNotUpdateStayersAtWeekends = "Can not update stayers at weekends";
+  static const String canNotUpdateWeekAbsentsAtWeekends = "Can not updated week absents at weekends";
+  static const String studentIsAlreadyMarkedAsWeekAbsent = "Student is already marked as week absent";
+  static const String studentIsNotMarkedAsWeekAbsent = "Student isn't marked as week absent";
 }
 
 class StudentAlreadyMarkedAsAbsentError extends BaseError {
@@ -31,4 +34,16 @@ class CanNotUpdateStayersAtWeekendsError extends BaseError {
 
 class StudentNotFoundError extends BaseError {
   StudentNotFoundError() : super(StudentErrorMessage.studentNotFound);
+}
+
+class CanNotUpdatedWeekAbsentsAtWeekendsError extends BaseError {
+  CanNotUpdatedWeekAbsentsAtWeekendsError() : super(StudentErrorMessage.canNotUpdateWeekAbsentsAtWeekends);
+}
+
+class StudentIsNotMarkedAsWeekAbsentError extends BaseError {
+  StudentIsNotMarkedAsWeekAbsentError() : super(StudentErrorMessage.studentIsNotMarkedAsWeekAbsent);
+}
+
+class StudentIsAlreadyMarkedAsWeekAbsentError extends BaseError {
+  StudentIsAlreadyMarkedAsWeekAbsentError() : super(StudentErrorMessage.studentIsAlreadyMarkedAsWeekAbsent);
 }

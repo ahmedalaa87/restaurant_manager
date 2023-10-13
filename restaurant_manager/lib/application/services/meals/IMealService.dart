@@ -9,5 +9,5 @@ abstract class IMealsService {
   Future<Either<BaseError, List<MealModel>>> getMeals(int page, MealTypes? mealType);
   Future<Either<BaseError, MealModel>> getMeal(int id);
   Future<Either<BaseError, MealModel>> createMeal(MealTypes mealType);
-  Future<Either<BaseError, StudentModel>> addStudentToMeal(int studentId, int mealId);
+  Future<Either<BaseError, StudentModel>> addStudentToMeal(int studentId, int mealId, bool timestampProvided);
 }

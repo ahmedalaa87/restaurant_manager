@@ -4,8 +4,8 @@ from fastapi.security import OAuth2PasswordRequestForm
 from models.students_models import StudentIn, StudentOut, StudentUpdate, StudentPasswordUpdate
 from lib.database.manager import DataBaseManager
 from sqlite3 import IntegrityError
-from lib.checks.checks import student_exists, student_is_stayer
-from lib.exceptions.students import StudentNotFound, EmailAlreadyExists, CannotUpdateWillStay, StudentAlreadyStayer, StudentIsNotStayer, WrongEmailOrPassword, WrongPassword
+from lib.checks.checks import student_exists, student_is_stayer, student_is_week_absent
+from lib.exceptions.students import CannotUpdateWeekAbsent, StudentAlreadyWeekAbsented, StudentNotFound, EmailAlreadyExists, CannotUpdateWillStay, StudentAlreadyStayer, StudentIsNotStayer, StudentNotWeekAbsented, WrongEmailOrPassword, WrongPassword
 from lib.exceptions.majors import MajorNotFound
 import datetime
 from fastapi_pagination import Page
@@ -106,6 +106,38 @@ async def update_will_not_stay(student_id: int, token: str = Depends(oauth2_sche
         
     await DataBaseManager().set_will_not_stay(student_id)
     return {"message": "Student will not stay"}
+
+
+@students.put("/week_absent/{student_id}", status_code=status.HTTP_200_OK)
+async def update_week_absent(student_id: int, token: str = Depends(oauth2_scheme)):
+    _ = await get_current_user("admin", token=token)
+    if not await student_exists(student_id):
+        raise StudentNotFound()
+    
+    if datetime.datetime.now().weekday() in [3, 4, 5]:
+        raise CannotUpdateWeekAbsent()
+    
+    if await student_is_week_absent(student_id):
+        raise StudentAlreadyWeekAbsented()
+        
+    await DataBaseManager().set_week_absent(student_id)
+    return {"message": "Student marked as week absent"}
+
+
+@students.put("/remove_week_absent/{student_id}", status_code=status.HTTP_200_OK)
+async def remove_week_absent(student_id: int, token: str = Depends(oauth2_scheme)):
+    _ = await get_current_user("admin", token=token)
+    if not await student_exists(student_id):
+        raise StudentNotFound()
+    
+    if datetime.datetime.now().weekday() in [3, 4, 5]:
+        raise CannotUpdateWeekAbsent()
+    
+    if not await student_is_week_absent(student_id):
+        raise StudentNotWeekAbsented()
+        
+    await DataBaseManager().unset_week_absent(student_id)
+    return {"message": "Student unmarked as week absent"}
 
 
 @students.post("/login", status_code=status.HTTP_200_OK)

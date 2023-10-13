@@ -5,6 +5,7 @@ class AuthErrorMessages {
   static const String wrongEmailOrPassword = 'Wrong email or password';
   static const String invalidAccessTokenError = "Invalid access token";
   static const String invalidRefreshTokenError = "Invalid refresh token";
+  static const String wrongPasswordError = "The provided password is incorrect";
 }
 
 class WrongEmailOrPasswordError extends BaseError {
@@ -18,4 +19,10 @@ class InvalidAccessTokenError extends BaseError {
 class InvalidRefreshTokenError extends BaseError {
   InvalidRefreshTokenError() : super(AuthErrorMessages.invalidRefreshTokenError);
 }
+
+
+class WrongPasswordError extends BaseError {
+  WrongPasswordError() : super(AuthErrorMessages.wrongPasswordError);
+}
+
 

@@ -25,7 +25,7 @@ class AdminOut(BaseModel):
     id: int
     name: str
     role: str
-    email: EmailStr
+    email: str
 
     class Config:
         orm_mode = True
@@ -35,7 +35,7 @@ class Admin(BaseModel):
     id: int
     name: str
     role: str
-    email: EmailStr
+    email: str
     password: str
 
     class Config:

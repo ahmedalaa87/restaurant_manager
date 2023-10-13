@@ -59,3 +59,19 @@ class UnMarkStudentAsAbsentErrorState extends StudentsErrorState {
 }
 
 class UnMarkStudentAsAbsentSuccessState extends StudentsSuccessState {}
+
+class UnMarkStudentAsWeekAbsentLoadingState extends StudentsLoadingState {}
+
+class UnMarkStudentAsWeekAbsentErrorState extends StudentsErrorState {
+  UnMarkStudentAsWeekAbsentErrorState(String message) : super(message);
+}
+
+class UnMarkStudentAsWeekAbsentSuccessState extends StudentsSuccessState {}
+
+class MarkStudentAsWeekAbsentLoadingState extends StudentsLoadingState {}
+
+class MarkStudentAsWeekAbsentErrorState extends StudentsErrorState {
+  MarkStudentAsWeekAbsentErrorState(String message) : super(message);
+}
+
+class MarkStudentAsWeekAbsentSuccessState extends StudentsSuccessState {}

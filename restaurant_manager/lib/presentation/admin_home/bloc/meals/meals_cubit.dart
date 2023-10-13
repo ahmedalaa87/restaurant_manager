@@ -64,9 +64,9 @@ class MealsCubit extends Cubit<MealsState> {
     });
   }
 
-  void addStudentToMeal(int studentId, int mealId) {
+  void addStudentToMeal(int studentId, int mealId, bool timestampProvided) {
     emit(AddStudentToMealLoadingState());
-    mealsService.addStudentToMeal(studentId, mealId).then((response) {
+    mealsService.addStudentToMeal(studentId, mealId, timestampProvided).then((response) {
       response.fold(
         (failure) => emit(
           AddStudentToMealErrorState(

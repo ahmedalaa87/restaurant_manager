@@ -4,13 +4,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:restaurant_manager/presentation/admin_home/bloc/meals/meals_cubit.dart';
 import 'package:restaurant_manager/presentation/authentication/bloc/authentication_cubit.dart';
 import 'package:restaurant_manager/presentation/authentication/bloc/authentication_states.dart';
-import 'package:restaurant_manager/presentation/shared/constants/login_types.dart';
+import 'package:restaurant_manager/core/constants/login_types.dart';
 import 'package:restaurant_manager/presentation/shared/extensions/context_extensions.dart';
 
 import '../../../router/routes.dart';
 import '../../shared/utils/validators.dart';
 import '../../shared/widgets/custom_button.dart';
-import '../widgets/credintials_field.dart';
+import '../../shared/widgets/credintials_field.dart';
 
 class LoginScreenParams {
   final LoginTypes loginType;

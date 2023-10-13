@@ -36,12 +36,20 @@ class StudentPage extends StatelessWidget {
           context.showSnackBar("Student marked as stayer", Colors.green);
         }
 
+        if (state is MarkStudentAsWeekAbsentSuccessState) {
+          context.showSnackBar("Student marked as week absent", Colors.green);
+        }
+
         if (state is UnMarkStudentAsAbsentSuccessState) {
           context.showSnackBar("Student unmarked as absent", Colors.green);
         }
 
         if (state is UnMarkStudentAsStayerSuccessState) {
           context.showSnackBar("Student unmarked as stayer", Colors.green);
+        }
+
+        if (state is UnMarkStudentAsWeekAbsentSuccessState) {
+          context.showSnackBar("Student unmarked as week absent", Colors.green);
         }
       },
       builder: (context, state) {
@@ -58,7 +66,7 @@ class StudentPage extends StatelessWidget {
           body: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 PropertyHolder(
                   propertyName: "Name",
@@ -68,6 +76,11 @@ class StudentPage extends StatelessWidget {
                 PropertyHolder(
                   propertyName: "Grade",
                   data: student.gradeYear.toString(),
+                  isTitle: true,
+                ),
+                PropertyHolder(
+                  propertyName: "Major",
+                  data: student.major,
                   isTitle: true,
                 ),
                 SizedBox(
@@ -113,7 +126,27 @@ class StudentPage extends StatelessWidget {
                       isLoading: state is StudentsLoadingState,
                     ),
                   ],
-                )
+                ),
+                SizedBox(
+                  height: 20.h,
+                ),
+                CustomButton(
+                  callback: () {
+                    studentsCubit.markStudentAsWeekAbsent(student.id);
+                  },
+                  text: "Mark as week absent",
+                  isLoading: state is StudentsLoadingState,
+                ),
+                SizedBox(
+                  height: 10.h,
+                ),
+                CustomButton(
+                  callback: () {
+                    studentsCubit.unMarkStudentAsWeekAbsent(student.id);
+                  },
+                  text: "UnMark as week absent",
+                  isLoading: state is StudentsLoadingState,
+                ),
               ],
             ),
           ),

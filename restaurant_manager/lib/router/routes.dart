@@ -7,4 +7,5 @@ class Routes {
   static const String student = '/student';
   static const String studentSearch = '/studentSearch';
   static const String qrCodeReader = '/qrCodeReader';
+  static const String changePassword = '/changePassword';
 }

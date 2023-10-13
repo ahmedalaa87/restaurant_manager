@@ -22,9 +22,17 @@ class StudentIsNotMarkedAsAStayerException implements Exception {}
 
 class MealTypeNotFoundException implements Exception {}
 
-class MealWithTypeAlreadyCreatedTodayExecption implements Exception {}
+class MealWithTypeAlreadyCreatedTodayException implements Exception {}
 
 class AddStudentToMealBadRequestException implements Exception {
   final String message;
   AddStudentToMealBadRequestException(this.message);
 }
+
+class WrongPasswordException implements Exception {}
+
+class StudentIsAlreadyMarkedAsWeekAbsentException implements Exception {}
+
+class StudentIsNotMarkedAsWeekAbsentException implements Exception {}
+
+class CanNotUpdateWeekAbsentsAtWeekendsException implements Exception {}

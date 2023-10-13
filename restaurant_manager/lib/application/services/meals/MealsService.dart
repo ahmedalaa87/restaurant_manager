@@ -67,7 +67,7 @@ class MealsService implements IMealsService {
   }
 
   @override
-  Future<Either<BaseError, StudentModel>> addStudentToMeal(int studentId, int mealId) async {
+  Future<Either<BaseError, StudentModel>> addStudentToMeal(int studentId, int mealId, bool timestampProvided) async {
     if (!await networkStatus.isConnected()) {
       return Left(NetworkError());
     }
@@ -76,7 +76,7 @@ class MealsService implements IMealsService {
     }
 
     try {
-      StudentModel student = await mealsDataProvider.addStudentToMeal(studentId, mealId);
+      StudentModel student = await mealsDataProvider.addStudentToMeal(studentId, mealId, timestampProvided);
 
       return Right(student);
     } on ServerException {
@@ -113,7 +113,7 @@ class MealsService implements IMealsService {
     return Left(InvalidAccessTokenError());
     } on MealTypeNotFoundException {
       return Left(MealTypeNotFoundError());
-    } on MealWithTypeAlreadyCreatedTodayExecption {
+    } on MealWithTypeAlreadyCreatedTodayException {
       return Left(MealWithTypeAlreadyCreatedTodayError());
     }
   }

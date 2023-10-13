@@ -168,5 +168,61 @@ class StudentService implements IStudentService {
       return Left(CanNotUpdateStayersAtWeekendsError());
     }
   }
+
+  @override
+  Future<Either<BaseError, void>> markStudentAsWeekAbsent(int id) async {
+    if (!await networkStatus.isConnected()) {
+    return Left(NetworkError());
+    }
+    if (AuthInfo.tokenModel == null) {
+    return Left(InvalidAccessTokenError());
+    }
+
+    try {
+    await studentDataProvider.markStudentAsWeekAbsent(id);
+
+    return const Right(null);
+    } on ServerException {
+    return Left(ServerError());
+    } on InvalidRefreshTokenException {
+    return Left(InvalidRefreshTokenError());
+    } on InvalidAccessTokenException {
+    return Left(InvalidAccessTokenError());
+    } on StudentNotFoundException {
+    return Left(StudentNotFoundError());
+    } on StudentIsAlreadyMarkedAsWeekAbsentException {
+    return Left(StudentIsAlreadyMarkedAsWeekAbsentError());
+    } on CanNotUpdateWeekAbsentsAtWeekendsException {
+    return Left(CanNotUpdatedWeekAbsentsAtWeekendsError());
+    }
+  }
+
+  @override
+  Future<Either<BaseError, void>> unMarkStudentAsWeekAbsent(int id) async {
+    if (!await networkStatus.isConnected()) {
+      return Left(NetworkError());
+    }
+    if (AuthInfo.tokenModel == null) {
+      return Left(InvalidAccessTokenError());
+    }
+
+    try {
+      await studentDataProvider.unMarkStudentAsWeekAbsent(id);
+
+      return const Right(null);
+    } on ServerException {
+      return Left(ServerError());
+    } on InvalidRefreshTokenException {
+      return Left(InvalidRefreshTokenError());
+    } on InvalidAccessTokenException {
+      return Left(InvalidAccessTokenError());
+    } on StudentNotFoundException {
+      return Left(StudentNotFoundError());
+    } on StudentIsNotMarkedAsWeekAbsentException {
+      return Left(StudentIsNotMarkedAsWeekAbsentError());
+    } on CanNotUpdateWeekAbsentsAtWeekendsException {
+      return Left(CanNotUpdatedWeekAbsentsAtWeekendsError());
+    }
+  }
   
 }

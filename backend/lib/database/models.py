@@ -28,7 +28,9 @@ class DbModels:
             Column("major_id", ForeignKey("majors.id", ondelete="CASCADE")),
             Column("will_stay", Boolean, server_default="0"),
             Column("email", String, unique=True),
-            Column("password", String)
+            Column("password", String),
+            Column("week_absent", Boolean, server_default="0"),
+            Column("ios", Boolean, server_default="0")
         )
     
     def _create_absences_table(self) -> None:

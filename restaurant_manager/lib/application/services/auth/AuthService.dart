@@ -8,7 +8,7 @@ import 'package:restaurant_manager/domain/models/UserModel.dart';
 import 'package:restaurant_manager/infrastructure/auth/AuthInfo.dart';
 import 'package:restaurant_manager/infrastructure/data_providers/AuthDataProvider.dart';
 import 'package:restaurant_manager/infrastructure/local_storage/CacheStorage.dart';
-import 'package:restaurant_manager/presentation/shared/constants/login_types.dart';
+import 'package:restaurant_manager/core/constants/login_types.dart';
 
 import '../../../infrastructure/data_providers/shared/exceptions.dart';
 import '../../../infrastructure/network_status/network_status.dart';
@@ -117,5 +117,28 @@ class AuthService implements IAuthService {
     AuthInfo.setUser(null);
     AuthInfo.setLoginType(null);
     return const Right(null);
+  }
+
+  @override
+  Future<Either<BaseError, void>> changePassword(String currentPassword, String newPassword) async {
+    if (!await networkStatus.isConnected()) {
+    return Left(NetworkError());
+    }
+    if (AuthInfo.tokenModel == null) {
+    return Left(InvalidAccessTokenError());
+    }
+
+    try {
+      await authDataProvider.changeStudentPassword(currentPassword, newPassword);
+      return const Right(null);
+    } on ServerException {
+    return Left(ServerError());
+    } on InvalidRefreshTokenException {
+    return Left(InvalidRefreshTokenError());
+    } on InvalidAccessTokenException {
+    return Left(InvalidAccessTokenError());
+    } on WrongPasswordException {
+      return Left(WrongPasswordError());
+    }
   }
 }

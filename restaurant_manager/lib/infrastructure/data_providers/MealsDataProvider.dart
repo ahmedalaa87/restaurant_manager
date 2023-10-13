@@ -12,7 +12,7 @@ abstract class IMealsDataProvider {
   Future<List<MealModel>> getMeals(int page, MealTypes? mealTypes);
   Future<MealModel> getMeal(int id);
   Future<MealModel> createMeal(MealTypes mealType);
-  Future<StudentModel> addStudentToMeal(int studentId, int mealId);
+  Future<StudentModel> addStudentToMeal(int studentId, int mealId, bool timestampProvided);
 }
 
 class MealsDataProvider extends IMealsDataProvider {
@@ -93,7 +93,7 @@ class MealsDataProvider extends IMealsDataProvider {
       }
 
       if (response.statusCode == 409) {
-        throw MealWithTypeAlreadyCreatedTodayExecption();
+        throw MealWithTypeAlreadyCreatedTodayException();
       }
 
       return MealModel.fromJson(response.data);
@@ -103,9 +103,9 @@ class MealsDataProvider extends IMealsDataProvider {
   }
 
   @override
-  Future<StudentModel> addStudentToMeal(int studentId, int mealId) async {
+  Future<StudentModel> addStudentToMeal(int studentId, int mealId, bool timestampProvided) async {
     try {
-      final response = await _dio.put("/add_student",
+      final response = await _dio.put("/add_student?timestamp_provided=$timestampProvided",
           data: {
             "student_id": studentId,
             "meal_id": mealId

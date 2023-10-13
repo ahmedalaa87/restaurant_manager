@@ -1,7 +1,7 @@
 import 'package:restaurant_manager/domain/models/TokenModel.dart';
 import 'package:restaurant_manager/domain/models/UserModel.dart';
 
-import '../../presentation/shared/constants/login_types.dart';
+import '../../core/constants/login_types.dart';
 
 class AuthInfo {
   static UserModel? user;

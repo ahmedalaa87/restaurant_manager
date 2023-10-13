@@ -14,4 +14,8 @@ abstract class IStudentService {
   Future<Either<BaseError, void>> unMarkStudentAsAbsent(int id);
 
   Future<Either<BaseError, void>> unMarkStudentAsStayer(int id);
+
+  Future<Either<BaseError, void>> markStudentAsWeekAbsent(int id);
+
+  Future<Either<BaseError, void>> unMarkStudentAsWeekAbsent(int id);
 }

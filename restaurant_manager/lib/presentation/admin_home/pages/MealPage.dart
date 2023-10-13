@@ -66,16 +66,15 @@ class MealPage extends StatelessWidget {
                   if (code == null) return;
                   try {
                     Map<String, dynamic> data = jsonDecode(code as String);
-                    print(data["timestamp"]);
-                    print(DateTime.now().toUtc().timeStamp - 350);
-                    if (data["timestamp"] < DateTime.now().toUtc().timeStamp - 350) {
+
+                    if (data["timestamp"] != null && data["timestamp"] < DateTime.now().toUtc().timeStamp - 350) {
                       if (context.mounted) {
                       context.showSnackBar("QR Code Expired", Colors.red);
                       }
                       return;
                     }
 
-                    mealsCubit.addStudentToMeal(data["id"], mealId);
+                    mealsCubit.addStudentToMeal(data["id"], mealId, data["timestamp"] != null);
                   } catch (e) {
                     if (context.mounted) {
                       context.showSnackBar("Invalid QR Code", Colors.red);

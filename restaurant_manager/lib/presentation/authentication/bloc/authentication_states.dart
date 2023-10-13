@@ -35,3 +35,11 @@ class AuthLogoutSuccessState extends AuthSuccessState {}
 class AuthLogoutErrorState extends AuthErrorState {
   AuthLogoutErrorState(String message) : super(message);
 }
+
+class ChangePasswordLoadingState extends AuthLoadingState {}
+
+class ChangePasswordSuccessState extends AuthSuccessState {}
+
+class ChangePasswordErrorState extends AuthErrorState {
+  ChangePasswordErrorState(String message) : super(message);
+}

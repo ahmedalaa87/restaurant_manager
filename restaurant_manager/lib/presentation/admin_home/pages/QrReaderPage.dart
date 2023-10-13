@@ -36,6 +36,11 @@ class _QrReaderPageState extends State<QrReaderPage> {
             flex: 1,
             child: QRView(
               key: qrKey,
+              overlay: QrScannerOverlayShape(
+                cutOutHeight: 150,
+                cutOutWidth: 150,
+                borderLength: 25
+              ),
               onQRViewCreated: (QRViewController controller) {
                 this.controller = controller;
                 controller.scannedDataStream.listen((scanData) {

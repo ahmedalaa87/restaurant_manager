@@ -11,6 +11,7 @@ class MealStudent(BaseModel):
     id: int
     name: str
     entry_year: int
+    major_id: int
 
 
 class MealOut(BaseModel):

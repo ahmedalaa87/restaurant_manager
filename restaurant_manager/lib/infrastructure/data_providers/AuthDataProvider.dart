@@ -13,6 +13,7 @@ abstract class IAuthDataProvider {
   Future<TokenModel> refreshStudentToken(String refreshToken);
   Future<UserModel> getCurrentAdmin();
   Future<UserModel> getCurrentStudent();
+  Future<void> changeStudentPassword(String currentPassword, String newPassword);
 }
 
 class AuthDataProvider implements IAuthDataProvider {
@@ -103,7 +104,6 @@ class AuthDataProvider implements IAuthDataProvider {
 
   @override
   Future<TokenModel> refreshStudentToken(String refreshToken) async {
-    print("refreshStudentToken");
     try {
       final response = await _dio.post("/students/refresh",
           options: Options(headers: {
@@ -151,6 +151,32 @@ class AuthDataProvider implements IAuthDataProvider {
       }
 
       return UserModel.fromJson(response.data);
+    } on DioError {
+      throw ServerException();
+    }
+  }
+
+  @override
+  Future<void> changeStudentPassword(String currentPassword, String newPassword) async {
+    try {
+      final response = await _dio.patch("/students/reset_password",
+          data: {
+            "old_password": currentPassword,
+            "new_password": newPassword
+          },
+          options: Options(headers: {
+            "Authorization": "Bearer ${AuthInfo.tokenModel!.accessToken}",
+          }));
+
+      if (response.statusCode == 401) {
+        throw InvalidAccessTokenException();
+      }
+
+      if (response.statusCode == 400) {
+        throw WrongPasswordException();
+      }
+
+      return;
     } on DioError {
       throw ServerException();
     }

@@ -83,6 +83,19 @@ class StudentsCubit extends Cubit<StudentsState> {
     );
   }
 
+  void markStudentAsWeekAbsent(int studentId) async {
+    emit(MarkStudentAsWeekAbsentLoadingState());
+    final response = await studentService.markStudentAsWeekAbsent(studentId);
+    response.fold(
+          (failure) {
+        emit(MarkStudentAsWeekAbsentErrorState(failure.message));
+      },
+          (success) {
+        emit(MarkStudentAsWeekAbsentSuccessState());
+      },
+    );
+  }
+
   void unMarkStudentAsAbsent(int studentId) async {
     emit(UnMarkStudentAsAbsentLoadingState());
     final response = await studentService.unMarkStudentAsAbsent(studentId);
@@ -105,6 +118,19 @@ class StudentsCubit extends Cubit<StudentsState> {
       },
       (success) {
         emit(UnMarkStudentAsStayerSuccessState());
+      },
+    );
+  }
+
+  void unMarkStudentAsWeekAbsent(int studentId) async {
+    emit(UnMarkStudentAsWeekAbsentLoadingState());
+    final response = await studentService.unMarkStudentAsWeekAbsent(studentId);
+    response.fold(
+          (failure) {
+        emit(UnMarkStudentAsWeekAbsentErrorState(failure.message));
+      },
+          (success) {
+        emit(UnMarkStudentAsWeekAbsentSuccessState());
       },
     );
   }

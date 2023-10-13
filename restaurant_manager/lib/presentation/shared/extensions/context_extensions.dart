@@ -18,8 +18,13 @@ extension ContextExtension on BuildContext {
     return Navigator.of(this);
   }
 
+  ScaffoldMessengerState get messenger {
+    return ScaffoldMessenger.of(this);
+  }
+
   void showSnackBar(String message, Color color) {
-    ScaffoldMessenger.of(this).showSnackBar(
+    messenger.hideCurrentSnackBar();
+    messenger.showSnackBar(
         SnackBar(
           content: Text(
             message,
@@ -28,6 +33,7 @@ extension ContextExtension on BuildContext {
             ),
           ),
           backgroundColor: color,
+          duration: const Duration(seconds: 1),
         )
     );
   }

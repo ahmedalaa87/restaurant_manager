@@ -7,18 +7,21 @@ from lib.checks.checks import (
     student_has_meal_today,
     student_is_absent_today,
     student_is_stayer,
+    student_is_week_absent,
 )
 from lib.exceptions.meal_students import (
+    InvalidQrCode,
     MealExpired,
     StudentAlreadyHasMeal,
     StudentIsAbsent,
     StudentIsNotStayer,
+    StudentIsWeekAbsent,
 )
 from lib.exceptions.students import StudentNotFound
 from models.meal_students_models import MealStudentIn
 from models.meals_models import MealIn, MealOut, MealUpdate
 from lib.exceptions.meals import MealNotFound
-from lib.exceptions.meal_types import MealTypeNotFound
+from lib.exceptions.meal_types import MealTypeNotFound, MealWithTypeAlreadyCreatedToday
 from lib.database.manager import DataBaseManager
 from datetime import date, datetime
 from fastapi_pagination import Page
@@ -37,7 +40,7 @@ async def create_meal(meal: MealIn, token: str = Depends(oauth2_scheme)):
         raise MealTypeNotFound()
 
     if await meal_type_created_today(meal.meal_type_id):
-        raise 
+        raise MealWithTypeAlreadyCreatedToday()
 
     meal_id = await DataBaseManager().create_meal(meal)
     return {"id": meal_id, **meal.dict()}
@@ -87,6 +90,7 @@ async def get_meal_by_date_and_meal_type(
 
 @meals.put("/add_student", response_model=StudentOut, status_code=status.HTTP_200_OK)
 async def create_meal_student(
+    timestamp_provided: bool,
     meal_student: MealStudentIn, token: str = Depends(oauth2_scheme)
 ):
     _ = await get_current_user("admin", token=token)
@@ -96,24 +100,32 @@ async def create_meal_student(
     student = await DataBaseManager().get_student(meal_student.student_id)
     if not student:
         raise StudentNotFound()
+    
+    print(timestamp_provided)
+
+    if not timestamp_provided and not student.ios:
+        raise InvalidQrCode()
+    
     if await student_has_meal_today(meal_student.student_id, meal_student.meal_id):
         raise StudentAlreadyHasMeal()
-
-    if (meal.date_time - datetime.utcnow()).seconds >= 10800:
+    if (datetime.utcnow() - meal.date_time).seconds >= 10800:
         raise MealExpired()
     
-    if (
-        await student_is_absent_today(meal_student.student_id)
-        and meal.meal_type_id == 2
-        and datetime.now().weekday() != 3
-    ):
-        raise StudentIsAbsent()
-    if datetime.now().weekday() == 3 and meal.meal_type_id in [2, 3] and not await student_is_stayer(meal_student.student_id):
-        raise StudentIsNotStayer()
-    if datetime.now().weekday() == 4 and not await student_is_stayer(meal_student.student_id):
-        raise StudentIsNotStayer()
-    if datetime.now().weekday() == 5 and meal.meal_type_id in [1, 2] and not await student_is_stayer(meal_student.student_id):
-        raise StudentIsNotStayer()
+    if await student_is_week_absent(meal_student.student_id) and not (datetime.now().weekday() == 5 and meal.meal_type_id == 3):
+        raise StudentIsWeekAbsent()
+    
+    # if (
+    #     await student_is_absent_today(meal_student.student_id)
+    #     and meal.meal_type_id == 2
+    #     and datetime.now().weekday() != 3
+    # ):
+    #     raise StudentIsAbsent()
+    # if datetime.now().weekday() == 3 and meal.meal_type_id in [2, 3] and not await student_is_stayer(meal_student.student_id):
+    #     raise StudentIsNotStayer()
+    # if datetime.now().weekday() == 4 and not await student_is_stayer(meal_student.student_id):
+    #     raise StudentIsNotStayer()
+    # if datetime.now().weekday() == 5 and meal.meal_type_id in [1, 2] and not await student_is_stayer(meal_student.student_id):
+    #     raise StudentIsNotStayer()
     
     await DataBaseManager().create_meal_student(meal_student)
     return student

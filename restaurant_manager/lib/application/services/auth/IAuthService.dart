@@ -1,5 +1,5 @@
 import 'package:restaurant_manager/domain/models/UserModel.dart';
-import 'package:restaurant_manager/presentation/shared/constants/login_types.dart';
+import 'package:restaurant_manager/core/constants/login_types.dart';
 
 import '../../../domain/models/TokenModel.dart';
 import '../../errors/BaseError.dart';
@@ -15,4 +15,6 @@ abstract class IAuthService {
   Future<Either<BaseError, void>> loadCachedAuthData();
 
   Future<Either<BaseError, void>> logout();
+
+  Future<Either<BaseError, void>> changePassword(String currentPassword, String newPassword);
 }

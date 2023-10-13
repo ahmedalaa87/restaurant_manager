@@ -160,7 +160,7 @@ class DataBaseManager(metaclass=Singleton):
         return await self.db.fetch_one(query)
 
     async def get_meal_students_info(self, meal_id: int) -> list[MealStudent]:
-        query = """SELECT students.id, students.name, students.entry_year FROM students INNER JOIN meal_students ON students.id = meal_students.student_id WHERE meal_students.meal_id = :meal_id;"""
+        query = """SELECT students.id, students.name, students.entry_year, students.major_id FROM students INNER JOIN meal_students ON students.id = meal_students.student_id WHERE meal_students.meal_id = :meal_id;"""
 
         return await self.db.fetch_all(query=query, values={"meal_id": meal_id})
 
@@ -439,3 +439,15 @@ class DataBaseManager(metaclass=Singleton):
     async def set_will_not_stay(self, student_id: int) -> None:
         query = "UPDATE students SET will_stay = 0 WHERE students.id = :student_id;"
         await self.db.execute(query, {"student_id": student_id})
+
+    async def set_week_absent(self, student_id: int) -> None:
+        query = "UPDATE students SET week_absent = 1 WHERE students.id = :student_id;"
+        await self.db.execute(query, {"student_id": student_id})
+    
+    async def unset_week_absent(self, student_id: int) -> None:
+        query = "UPDATE students SET week_absent = 0 WHERE students.id = :student_id;"
+        await self.db.execute(query, {"student_id": student_id})
+
+    async def reset_week_absent_column(self) -> None:
+        query = "UPDATE students SET week_absent = 0;"
+        await self.db.execute(query)
