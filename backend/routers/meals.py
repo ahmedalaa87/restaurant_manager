@@ -101,8 +101,6 @@ async def create_meal_student(
     if not student:
         raise StudentNotFound()
     
-    print(timestamp_provided)
-
     if not timestamp_provided and not student.ios:
         raise InvalidQrCode()
     
@@ -114,18 +112,18 @@ async def create_meal_student(
     if await student_is_week_absent(meal_student.student_id) and not (datetime.now().weekday() == 5 and meal.meal_type_id == 3):
         raise StudentIsWeekAbsent()
     
-    # if (
-    #     await student_is_absent_today(meal_student.student_id)
-    #     and meal.meal_type_id == 2
-    #     and datetime.now().weekday() != 3
-    # ):
-    #     raise StudentIsAbsent()
-    # if datetime.now().weekday() == 3 and meal.meal_type_id in [2, 3] and not await student_is_stayer(meal_student.student_id):
-    #     raise StudentIsNotStayer()
-    # if datetime.now().weekday() == 4 and not await student_is_stayer(meal_student.student_id):
-    #     raise StudentIsNotStayer()
-    # if datetime.now().weekday() == 5 and meal.meal_type_id in [1, 2] and not await student_is_stayer(meal_student.student_id):
-    #     raise StudentIsNotStayer()
+    if (
+        await student_is_absent_today(meal_student.student_id)
+        and meal.meal_type_id == 2
+        and datetime.now().weekday() != 3
+    ):
+        raise StudentIsAbsent()
+    if datetime.now().weekday() == 3 and meal.meal_type_id in [2, 3] and not await student_is_stayer(meal_student.student_id):
+        raise StudentIsNotStayer()
+    if datetime.now().weekday() == 4 and not await student_is_stayer(meal_student.student_id):
+        raise StudentIsNotStayer()
+    if datetime.now().weekday() == 5 and meal.meal_type_id in [1, 2] and not await student_is_stayer(meal_student.student_id):
+        raise StudentIsNotStayer()
     
     await DataBaseManager().create_meal_student(meal_student)
     return student
