@@ -84,11 +84,13 @@ class DataBaseManager(metaclass=Singleton):
         query = self.models.students.select()
         return await paginate(self.db, query)
 
-    async def query_students(self, query: str) -> Page[Student]:
-        query = self.models.students.select().where(
-            func.lower(self.models.students.name).like(f"%{query.lower()}%")
-        )
-        return await paginate(self.db, query)
+    async def query_students(self, search_query: str) -> list[Student]:
+        query = f"""
+        SELECT *
+        FROM students
+        WHERE name LIKE :pattern
+        """
+        return await self.db.fetch_all(query, {"pattern": f"%{search_query}%"})
 
     async def update_student(self, student_id: int, **fields) -> None:
         query = (

@@ -40,9 +40,10 @@ async def get_all_students(token: str = Depends(oauth2_scheme)):
     _ = await get_current_user("admin", token=token)
     return await DataBaseManager().get_all_students()
 
-@students.get("/search/{query}", response_model=Page[StudentOut], status_code=status.HTTP_200_OK)
+@students.get("/search/{query}", response_model=list[StudentOut], status_code=status.HTTP_200_OK)
 async def search_students(query: str, token: str = Depends(oauth2_scheme)):
     _ = await get_current_user("admin", token=token)
+    print(query)
     return await DataBaseManager().query_students(query)
 
 
